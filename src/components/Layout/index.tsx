@@ -52,7 +52,7 @@ function CustomAppTitle() {
     const pagepath = location.pathname;
     return (
         <Stack direction="row" alignItems="center" spacing={2}>
-            <Avatar alt='Reina' src='/images/reina.png' />
+            <Avatar alt='Reina' src='/images/reina.png' onDragStart={(event) => event.preventDefault()} />
             <Typography variant="h6">ReinaManager</Typography>
             <Chip size="small" label="BETA" color="info" />
             {Toolbarsswitch(pagepath) && <SearchBox />}

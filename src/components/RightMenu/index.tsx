@@ -1,48 +1,48 @@
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import EditIcon from '@mui/icons-material/Edit';
 import Divider from '@mui/material/Divider';
-import ArchiveIcon from '@mui/icons-material/Archive';
-import FileCopyIcon from '@mui/icons-material/FileCopy';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import { useState } from 'react';
+import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
+import ArticleIcon from '@mui/icons-material/Article';
+import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 
 
-const RightMenu = ({ open }) => {
-    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    const isopen = Boolean(anchorEl);
-    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorEl(event.currentTarget);
-    };
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
+interface RightMenuProps {
+    isopen: boolean;
+    anchorPosition?: { top: number; left: number };
+    setAnchorEl: (value: null) => void;
+}
+const RightMenu: React.FC<RightMenuProps> = ({ isopen, anchorPosition, setAnchorEl }) => {
+
     return (
-        <div>
+        <>
             <Menu
-                anchorEl={anchorEl}
                 open={isopen}
-                onClose={handleClose}
+                onClose={() => setAnchorEl(null)}
+                anchorReference="anchorPosition"
+                anchorPosition={anchorPosition}
+                transitionDuration={200}
             >
-                <MenuItem onClick={handleClose} disableRipple>
-                    <EditIcon />
-                    Edit
+
+                <MenuItem disableRipple>
+                    <PlayCircleOutlineIcon />
+                    启动游戏
                 </MenuItem>
-                <MenuItem onClick={handleClose} disableRipple>
-                    <FileCopyIcon />
-                    Duplicate
+                <MenuItem disableRipple>
+                    <ArticleIcon />
+                    进入详情页
                 </MenuItem>
                 <Divider sx={{ my: 0.5 }} />
-                <MenuItem onClick={handleClose} disableRipple>
-                    <ArchiveIcon />
-                    Archive
+                <MenuItem disableRipple>
+                    <FolderOpenIcon />
+                    打开本地文件夹
                 </MenuItem>
-                <MenuItem onClick={handleClose} disableRipple>
+                <MenuItem disableRipple>
                     <MoreHorizIcon />
-                    More
+                    更多
                 </MenuItem>
             </Menu>
-        </div>
+        </>
     );
 }
 export default RightMenu;
