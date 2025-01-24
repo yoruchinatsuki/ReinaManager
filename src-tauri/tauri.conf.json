@@ -1,6 +1,6 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "ReinaManager",
+  "productName": "reina-manager",
   "version": "0.1.0",
   "identifier": "com.reinamanager.dev",
   "build": {

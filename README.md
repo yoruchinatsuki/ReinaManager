@@ -1,2 +1,19 @@
-# ReinaManager
-A visual novel management,Under development......
+# 									ReinaManager
+##### 																A visual novel management,Under development...
+
+
+
+## Stacks
+
+- Tauri
+
+- React
+
+- Material UI
+
+- UnoCSS
+
+  
+
+
+
