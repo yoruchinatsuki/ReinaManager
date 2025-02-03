@@ -1,4 +1,3 @@
-import type * as React from 'react';
 import { useLocation } from 'react-router'
 import Stack from '@mui/material/Stack';
 import Chip from '@mui/material/Chip';
@@ -41,7 +40,7 @@ function DemoPageContent({ page }: { page: React.ReactNode }) {
 
 function SidebarFooter({ mini }: SidebarFooterProps) {
     return (
-        <Typography variant="caption" className='m-1 whitespace-nowrap overflow-hidden'>
+        <Typography variant="caption" className="m-1 whitespace-nowrap overflow-hidden text-align-center">
             {mini ? `© ${new Date().getFullYear()}` : `© ${new Date().getFullYear()} Made by huoshen80`}
         </Typography>
     );
@@ -82,6 +81,7 @@ export const Layout: React.FC<LayoutProps> = ({ title, outpage, path }) => {
                 <Typography variant="h5" sx={{
                     marginLeft: '3%',
                     marginTop: '1%',
+                    userSelect: 'none'
                 }}>{title}</Typography>
                 <DemoPageContent page={outpage} />
             </DashboardLayout>

@@ -1,4 +1,3 @@
-import * as React from 'react';
 import { styled } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
@@ -11,36 +10,55 @@ import MenuItem from '@mui/material/MenuItem';
 import AddIcon from '@mui/icons-material/Add';
 import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
 import { useModal } from '@/components/Toolbar';
+import { useState } from 'react';
+import { fetchFromBgm } from '@/api/bgm';
+import Alert from '@mui/material/Alert';
+import { useGameStore, useBGM_TOKEN } from '@/store/';
 
 const AddModal: React.FC = () => {
+    const { BGM_TOKEN } = useBGM_TOKEN();
     const { isopen, handleOpen, handleClose } = useModal();
+    const [formText, setFormText] = useState('');
+    const [error, setError] = useState('');
+    const addGame = useGameStore(state => state.addGame);
+    const handleSubmit = async () => {
+        try {
+            const res = await fetchFromBgm(formText, BGM_TOKEN);
+            if (typeof res === 'string') {
+                setError(res);
+                setTimeout(() => {
+                    setError('');
+                }, 5000);
+                return null;
+            }
+            await addGame(res);
+            handleClose();
+            setFormText('');
+        } catch (error) {
+            console.error(error);
+        }
+        //TODO：数据存储本地数据库功能
+    }
+
     return (
-        <React.Fragment>
+        <>
             <Button onClick={handleOpen} startIcon={<AddIcon />}>添加游戏</Button>
             <Dialog
                 open={isopen}
-                onClose={handleClose}
-                disableRestoreFocus // Prevents automatic focus restoration
-                // Ensure the modal is properly labeled for accessibility
-                aria-labelledby="addgame-dialog-title"
-                PaperProps={{
-                    component: 'form',
-                    onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
-                        event.preventDefault();
-                        const formData = new FormData(event.currentTarget);
-                        const formJson = Object.fromEntries((formData).entries());
-                        const text = formJson.text;
-                        console.log(text);
+                onClose={(_, reason) => {
+                    if (reason !== 'backdropClick') {
                         handleClose();
-                    },
+                    }
                 }}
+                closeAfterTransition={false}
+                aria-labelledby="addgame-dialog-title"
             >
+                {error && <Alert severity="error">{error}</Alert>}
                 <DialogTitle>添加游戏</DialogTitle>
                 <DialogContent>
                     <InputFileUpload />
                     <SelectGameProgram />
                     <TextField
-                        autoFocus
                         required
                         margin="dense"
                         id="name"
@@ -49,14 +67,16 @@ const AddModal: React.FC = () => {
                         type="text"
                         fullWidth
                         variant="standard"
+                        autoComplete="off"
+                        onChange={(event) => setFormText(event.target.value)}
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose}>取消</Button>
-                    <Button type="submit">确认</Button>
+                    <Button variant="outlined" onClick={handleClose}>取消</Button>
+                    <Button variant="contained" onClick={handleSubmit} disabled={formText === ''}>确认</Button>
                 </DialogActions>
             </Dialog>
-        </React.Fragment>
+        </>
     );
 }
 const VisuallyHiddenInput = styled('input')({
@@ -76,7 +96,6 @@ const InputFileUpload = () => {
         <Button
             component="label"
             variant="contained"
-            // tabIndex={-1}
             startIcon={<DriveFolderUploadIcon />}
         >
             选择文件夹

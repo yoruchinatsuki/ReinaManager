@@ -1,4 +1,4 @@
-import * as React from 'react';
+import { useState } from 'react';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -14,13 +14,15 @@ import Switch from '@mui/material/Switch';
 const SortModal: React.FC = () => {
     const { isopen, handleOpen, handleClose } = useModal();
     return (
-        <React.Fragment>
+        <>
             <Button onClick={handleOpen} startIcon={<SwapVertIcon />}>排序</Button>
             <Dialog
                 open={isopen}
                 onClose={handleClose}
-                disableRestoreFocus // Prevents automatic focus restoration
-                // Ensure the modal is properly labeled for accessibility
+                closeAfterTransition={false}
+                TransitionProps={{
+                    timeout: 0, // 禁用过渡动画
+                }}
                 aria-labelledby="sort-dialog-title"
                 PaperProps={{
                     component: 'form',
@@ -44,7 +46,7 @@ const SortModal: React.FC = () => {
                     <Button type="submit">确认</Button>
                 </DialogActions>
             </Dialog>
-        </React.Fragment>
+        </>
     );
 }
 const SortOption = () => {
@@ -59,7 +61,7 @@ const SortOption = () => {
     );
 }
 const UpDownSwitches = () => {
-    const [updown, setupdown] = React.useState(false);
+    const [updown, setupdown] = useState(false);
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setupdown(event.target.checked);

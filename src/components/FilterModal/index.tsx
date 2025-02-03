@@ -1,4 +1,3 @@
-import * as React from 'react';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -12,13 +11,15 @@ import { useModal } from '@/components/Toolbar';
 const FilterModal: React.FC = () => {
     const { isopen, handleOpen, handleClose } = useModal();
     return (
-        <React.Fragment>
+        <>
             <Button onClick={handleOpen} startIcon={<FilterAltIcon />}>筛选</Button>
             <Dialog
                 open={isopen}
                 onClose={handleClose}
-                disableRestoreFocus // Prevents automatic focus restoration
-                // Ensure the modal is properly labeled for accessibility
+                closeAfterTransition={false}
+                TransitionProps={{
+                    timeout: 0, // 禁用过渡动画
+                }}
                 aria-labelledby="filter-dialog-title"
                 PaperProps={{
                     component: 'form',
@@ -41,7 +42,7 @@ const FilterModal: React.FC = () => {
                     <Button type="submit">确认</Button>
                 </DialogActions>
             </Dialog>
-        </React.Fragment>
+        </>
     );
 }
 const FilterOption = () => {
