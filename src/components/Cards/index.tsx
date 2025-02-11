@@ -12,11 +12,14 @@ const Cards = () => {
         mouseY: number;
         cardId: number | null;
     } | null>(null);
-    const { games } = useGameStore();
+    // const { setselectId } = useRightMenu();
+
+    const { games, fetchGames } = useGameStore();
+
 
     useEffect(() => {
-        useGameStore.getState().fetchGames()
-    }, []);
+        fetchGames()
+    }, [fetchGames]);
 
     const handleContextMenu = (event: React.MouseEvent, cardId: number) => {
         setMenuPosition({
@@ -27,7 +30,7 @@ const Cards = () => {
     };
 
     return (
-        <div className="flex flex-wrap gap-4 overflow-auto grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-7 ">
+        <div className="flex-1 text-center grid grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-4 p-4">
             <RightMenu isopen={Boolean(menuPosition)}
                 anchorPosition={
                     menuPosition
@@ -42,7 +45,7 @@ const Cards = () => {
                 return (
                     <Card
                         key={card.id}
-                        className={`flex-grow-0 min-w-34 max-w-56 mb-6 w-[calc(100%/5-1rem)] sm:w-[calc(100%/5-1rem)] md:w-[calc(100%/5-1rem)] lg:w-[calc(100%/6-1rem)] xl:w-[calc(100%/7-1rem)] ${isActive ? 'scale-y-105' : ''}`}
+                        className={`min-w-24 max-w-full ${isActive ? 'scale-y-105' : ''}`}
                         onContextMenu={(e) => handleContextMenu(e, card.id)}
                     >
                         <CardActionArea

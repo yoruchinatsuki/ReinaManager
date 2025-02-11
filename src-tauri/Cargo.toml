@@ -1,6 +1,6 @@
 [package]
 name = "reina-manager"
-version = "0.1.0"
+version = "0.1.1"
 description = "A Tauri App"
 authors = ["you"]
 license = "GNU AFFERO GENERAL PUBLIC LICENSE"
@@ -24,6 +24,7 @@ log = "0.4"
 tauri = { version = "2.2.3", features = [] }
 tauri-plugin-log = "2.0.0-rc"
 tauri-plugin-fs = "2"
+tauri-plugin-dialog = "2"
 
 [profile.dev]
 incremental = true # 以较小的步骤编译您的二进制文件。

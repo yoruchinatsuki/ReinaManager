@@ -1,4 +1,3 @@
-import { styled } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
@@ -8,12 +7,13 @@ import DialogTitle from '@mui/material/DialogTitle';
 import Select from '@mui/material/Select';
 import MenuItem from '@mui/material/MenuItem';
 import AddIcon from '@mui/icons-material/Add';
-import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
+import FileOpenIcon from '@mui/icons-material/FileOpen';
 import { useModal } from '@/components/Toolbar';
 import { useState } from 'react';
 import { fetchFromBgm } from '@/api/bgm';
 import Alert from '@mui/material/Alert';
 import { useGameStore, useBGM_TOKEN } from '@/store/';
+import { open } from '@tauri-apps/plugin-dialog';
 
 const AddModal: React.FC = () => {
     const { BGM_TOKEN } = useBGM_TOKEN();
@@ -39,6 +39,17 @@ const AddModal: React.FC = () => {
         }
         //TODO：数据存储本地数据库功能
     }
+    const handleDirectory = async () => {
+        const directory = await open({
+            multiple: false,
+            directory: false,
+            filters: [{
+                name: "",
+                extensions: ["exe"]
+            }]
+        });
+        return directory
+    }
 
     return (
         <>
@@ -56,7 +67,9 @@ const AddModal: React.FC = () => {
                 {error && <Alert severity="error">{error}</Alert>}
                 <DialogTitle>添加游戏</DialogTitle>
                 <DialogContent>
-                    <InputFileUpload />
+                    <Button variant='contained' onClick={async () => {
+                        console.log(await handleDirectory());
+                    }} startIcon={<FileOpenIcon />} >选择启动程序</Button>
                     <SelectGameProgram />
                     <TextField
                         required
@@ -79,34 +92,8 @@ const AddModal: React.FC = () => {
         </>
     );
 }
-const VisuallyHiddenInput = styled('input')({
-    clip: 'rect(0 0 0 0)',
-    clipPath: 'inset(50%)',
-    height: 1,
-    overflow: 'hidden',
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    whiteSpace: 'nowrap',
-    width: 1,
-});
 
-const InputFileUpload = () => {
-    return (
-        <Button
-            component="label"
-            variant="contained"
-            startIcon={<DriveFolderUploadIcon />}
-        >
-            选择文件夹
-            <VisuallyHiddenInput
-                type="file"
-                onChange={(event) => console.log(event.target.files)}
-                multiple
-            />
-        </Button>
-    );
-}
+
 const SelectGameProgram = () => {
     return (
         <div>

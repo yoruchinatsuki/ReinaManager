@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import { ThemeSwitcher } from '@toolpad/core/DashboardLayout';
-import { useLocation } from 'react-router';
+// import { useLocation } from 'react-router';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import AddModal from '@/components/AddModal';
 import SortModal from '@/components/SortModal';
@@ -36,19 +36,27 @@ export const Toolbars = () => {
 }
 export const Toolbarsswitch = (path: string) => {
     return (
-        !(path === "/settings")
+        !(path === "/settings" || path === "/")
     );
 }
 const Buttongroup = () => {
-    const location = useLocation();
-    const pagepath = location.pathname;
+    // const location = useLocation();
+    // const pagepath = location.pathname;
 
     return (
         <>
-            {!(pagepath === "/libraries") && <Button startIcon={<PlayArrowIcon />}>启动游戏</Button>}
+            <Button startIcon={<PlayArrowIcon />}>启动游戏</Button>
             <AddModal />
             <SortModal />
             <FilterModal />
+            {/* {pagepath !== '/' &&
+                <div>
+                    <Button startIcon={<PlayArrowIcon />}>启动游戏</Button>
+                    <AddModal />
+                    <SortModal />
+                    <FilterModal />
+                </div>
+            } */}
         </>
     );
 }

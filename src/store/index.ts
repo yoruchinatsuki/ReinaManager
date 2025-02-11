@@ -12,6 +12,10 @@ interface BGM_TOKEN {
     BGM_TOKEN: string;
     setBGM_TOKEN: (token: string) => void;
 }
+interface CardID {
+    selectId:number;
+    setselectId:(cardId:number)=>void;
+}
 
 export const useBGM_TOKEN = create<BGM_TOKEN>((set) => ({
     BGM_TOKEN: '',
@@ -54,3 +58,10 @@ export const useGameStore = create<GameStore>((set, get) => ({
         }
     }
 }));
+
+export const useRightMenu=create<CardID>((set)=>({
+    selectId:-1,
+    setselectId:(cardId:number)=>{
+        set({selectId:cardId})
+    }
+}))

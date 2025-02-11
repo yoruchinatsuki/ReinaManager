@@ -1,7 +1,8 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import { RouterProvider } from 'react-router'
+import routers from '@/routes'
 import './index.css'
-import App from './App.tsx'
 import 'virtual:uno.css'
 
 document.addEventListener("drop", (e) => e.preventDefault());
@@ -18,6 +19,6 @@ document.addEventListener('keydown', (e) => {
 })
 createRoot(document.getElementById('root') as HTMLElement).render(
   <StrictMode>
-    <App />
+    <RouterProvider router={routers} />
   </StrictMode>,
 )

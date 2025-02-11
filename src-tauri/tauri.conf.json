@@ -15,8 +15,8 @@
         "title": "ReinaManager",
         "width": 1200,
         "height": 700,
-        "minWidth": 960,
-        "minHeight": 540,
+        "minWidth": 962,
+        "minHeight": 542,
         "resizable": true,
         "fullscreen": false
       }

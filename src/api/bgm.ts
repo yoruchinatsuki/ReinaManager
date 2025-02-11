@@ -2,8 +2,6 @@ import http from './http'
 
 // const UA = 'huoshen80/ReinaManager(https://github.com/huoshen80/ReinaManager)';
 
-
-
 export async function fetchFromBgm(name: string, BGM_TOKEN: string,id?: string) {
     const BGM_HEADER = {
     headers: {
