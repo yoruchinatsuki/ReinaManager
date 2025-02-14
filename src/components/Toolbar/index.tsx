@@ -36,7 +36,7 @@ export const Toolbars = () => {
 }
 export const Toolbarsswitch = (path: string) => {
     return (
-        !(path === "/settings" || path === "/")
+        (path === "/libraries")
     );
 }
 const Buttongroup = () => {

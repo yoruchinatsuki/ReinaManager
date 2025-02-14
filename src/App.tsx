@@ -1,17 +1,45 @@
 import './App.css'
 import { Outlet } from "react-router";
-import { NAVIGATION } from '@/routes'
-import { ReactRouterAppProvider } from '@toolpad/core/react-router';
+// import { NAVIGATION } from '@/routes'
+import type { Navigation } from '@toolpad/core';
+import { ReactRouterAppProvider } from '@toolpad/core/react-router'
+import HomeIcon from '@mui/icons-material/Home';
+import GamesIcon from '@mui/icons-material/Games';
+import SettingsIcon from '@mui/icons-material/Settings';
+import { useGameStore } from './store';
 
 const App: React.FC = () => {
+  const { games } = useGameStore();
+  const lists = games.map((game) => {
+    return {
+      title: game.name_cn === "" ? game.name : game.name_cn,
+      segment: String(game.id)
+    }
+  })
+  const NAVIGATION: Navigation = [
+    {
+      kind: 'header',
+      title: '菜单',
+    },
+    {
+      title: '主页',
+      icon: <HomeIcon />,
+    },
+    {
+      segment: 'libraries',
+      title: '游戏仓库',
+      icon: <GamesIcon />,
+      children: [
+        ...lists,
+      ]
+    },
+    {
+      segment: 'settings',
+      title: '设置',
+      icon: <SettingsIcon />,
+    }
+  ];
   return (
-    // <BrowserRouter>
-    //   <Routes>
-    //     {routes.map((route) => (
-    //       <Route key={route.path} path={route.path} element={<Layout title={route.title} outpage={route.page} path={route.path} />} />
-    //     ))}
-    //   </Routes>
-    // </BrowserRouter>
     <ReactRouterAppProvider navigation={NAVIGATION}>
       <Outlet />
     </ReactRouterAppProvider>

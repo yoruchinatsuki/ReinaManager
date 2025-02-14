@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Card from '@mui/material/Card';
 import CardMedia from '@mui/material/CardMedia';
 import CardActionArea from '@mui/material/CardActionArea';
@@ -14,13 +14,7 @@ const Cards = () => {
     } | null>(null);
     // const { setselectId } = useRightMenu();
 
-    const { games, fetchGames } = useGameStore();
-
-
-    useEffect(() => {
-        fetchGames()
-    }, [fetchGames]);
-
+    const { games } = useGameStore();
     const handleContextMenu = (event: React.MouseEvent, cardId: number) => {
         setMenuPosition({
             mouseX: event.clientX,
@@ -31,7 +25,7 @@ const Cards = () => {
 
     return (
         <div className="flex-1 text-center grid grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 2xl:grid-cols-8 gap-4 p-4">
-            <RightMenu isopen={Boolean(menuPosition)}
+            <RightMenu id={menuPosition?.cardId} isopen={Boolean(menuPosition)}
                 anchorPosition={
                     menuPosition
                         ? { top: menuPosition.mouseY, left: menuPosition.mouseX }

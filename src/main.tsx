@@ -1,9 +1,10 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { RouterProvider } from 'react-router'
-import routers from '@/routes'
+import { routers } from '@/routes'
 import './index.css'
 import 'virtual:uno.css'
+import { initializeStores } from './store';
 
 document.addEventListener("drop", (e) => e.preventDefault());
 document.addEventListener("dragover", (e) => e.preventDefault(),);
@@ -17,8 +18,11 @@ document.addEventListener('keydown', (e) => {
     e.preventDefault()
   }
 })
-createRoot(document.getElementById('root') as HTMLElement).render(
-  <StrictMode>
-    <RouterProvider router={routers} />
-  </StrictMode>,
-)
+
+initializeStores().then(() => {
+  createRoot(document.getElementById('root') as HTMLElement).render(
+    <StrictMode>
+      <RouterProvider router={routers} />
+    </StrictMode>,
+  )
+})

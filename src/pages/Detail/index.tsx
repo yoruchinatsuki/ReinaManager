@@ -1,11 +1,32 @@
+import { useGameStore } from '@/store';
+import { PageContainer } from '@toolpad/core';
+import { useLocation } from 'react-router';
+import type { GameData } from '@/types';
+import { useEffect, useState } from 'react';
 export const Detail: React.FC = () => {
+
+    const { getGameById } = useGameStore();
+    const [game, setGame] = useState<GameData | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
+    const id = Number(useLocation().pathname.split('/').pop());
+    useEffect(() => {
+        getGameById(id)
+            .then(data => setGame(data))
+            .catch(error => {
+                console.error('获取游戏数据失败:', error);
+            })
+            .finally(() => setLoading(false));
+    }, [id, getGameById]);
+
+    if (loading) return <div>加载中...</div>;
+    if (!game) return <div>未找到游戏数据</div>;
     return (
-        <>
+        <PageContainer sx={{ maxWidth: '100% !important' }}>
             <div>
-                <h1>Detail</h1>
-                <p>test</p>
+                <h3>简介</h3>
+                <p>{game.summary}</p>
             </div>
 
-        </>
+        </PageContainer>
     )
 }

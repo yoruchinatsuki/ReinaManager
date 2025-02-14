@@ -42,7 +42,7 @@ export const Layout: React.FC = () => {
                 appTitle: CustomAppTitle,
                 toolbarActions: showTollbar ? Toolbars : ThemeSwitcher,
                 sidebarFooter: SidebarFooter,
-            }} sidebarExpandedWidth={180}
+            }} sidebarExpandedWidth={180} defaultSidebarCollapsed={true}
         >
             {showTollbar ?
                 <PageContainer sx={{ maxWidth: '100% !important' }}>

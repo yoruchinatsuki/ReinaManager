@@ -26,6 +26,9 @@ importers:
       '@tauri-apps/plugin-fs':
         specifier: ~2.2.0
         version: 2.2.0
+      '@tauri-apps/plugin-sql':
+        specifier: ~2
+        version: 2.2.0
       '@toolpad/core':
         specifier: ^0.12.0
         version: 0.12.0(@emotion/react@11.14.0(@types/react@18.3.18)(react@18.3.1))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@18.3.18)(react@18.3.1))(@types/react@18.3.18)(react@18.3.1))(@mui/icons-material@6.4.0(@mui/material@6.4.0(@emotion/react@11.14.0(@types/react@18.3.18)(react@18.3.1))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@18.3.18)(react@18.3.1))(@types/react@18.3.18)(react@18.3.1))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/react@18.3.18)(react@18.3.1))(@mui/material@6.4.0(@emotion/react@11.14.0(@types/react@18.3.18)(react@18.3.1))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@18.3.18)(react@18.3.1))(@types/react@18.3.18)(react@18.3.1))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@types/react@18.3.18)(react-dom@18.3.1(react@18.3.1))(react-router@7.1.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)(vite@6.0.7(@types/node@22.10.7)(jiti@2.4.2)(tsx@4.19.2)(yaml@2.5.1))
@@ -1027,6 +1030,9 @@ packages:
 
   '@tauri-apps/plugin-fs@2.2.0':
     resolution: {integrity: sha512-+08mApuONKI8/sCNEZ6AR8vf5vI9DXD4YfrQ9NQmhRxYKMLVhRW164vdW5BSLmMpuevftpQ2FVoL9EFkfG9Z+g==}
+
+  '@tauri-apps/plugin-sql@2.2.0':
+    resolution: {integrity: sha512-yGdybpaMENe/p6lTXslvDHYNNvD9qB7palaBBF5fJHdYSkwd3vrLiYU9dFfLwUAwnsBylND55EiivWsjhazejA==}
 
   '@toolpad/core@0.12.0':
     resolution: {integrity: sha512-2nzy6Y16nIvZspfdeKJqp70ZKTL4l3DVGe4zpjKi60UoRDYhQHTtwcXlTPiKYw/sCXjT8oa7svNaVD2GAI8Hfg==}
@@ -2712,6 +2718,10 @@ snapshots:
       '@tauri-apps/api': 2.2.0
 
   '@tauri-apps/plugin-fs@2.2.0':
+    dependencies:
+      '@tauri-apps/api': 2.2.0
+
+  '@tauri-apps/plugin-sql@2.2.0':
     dependencies:
       '@tauri-apps/api': 2.2.0
 

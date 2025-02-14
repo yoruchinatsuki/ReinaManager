@@ -3,14 +3,16 @@ import ArticleIcon from '@mui/icons-material/Article';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { useEffect } from 'react';
+import { Link } from 'react-router';
 
 interface RightMenuProps {
     isopen: boolean;
     anchorPosition?: { top: number; left: number };
     setAnchorEl: (value: null) => void;
+    id: number | null | undefined;
 }
 
-const RightMenu: React.FC<RightMenuProps> = ({ isopen, anchorPosition, setAnchorEl }) => {
+const RightMenu: React.FC<RightMenuProps> = ({ isopen, anchorPosition, setAnchorEl, id }) => {
     useEffect(() => {
         const handleInteraction = () => {
             setAnchorEl(null);
@@ -54,13 +56,16 @@ const RightMenu: React.FC<RightMenuProps> = ({ isopen, anchorPosition, setAnchor
                     <PlayCircleOutlineIcon className="mr-2" />
                     <span>启动游戏</span>
                 </div>
-                <div
-                    className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                    onClick={() => setAnchorEl(null)}
-                >
+                <Link
+                    className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer no-underline text-black visited:text-black"
+                    to={`/libraries/${id}`}
+                    onClick={() => {
+                        setAnchorEl(null)
+                    }
+                    }>
                     <ArticleIcon className="mr-2" />
                     <span>进入详情页</span>
-                </div>
+                </Link>
                 <div className="h-[1px] bg-gray-200 my-1" />
                 <div
                     className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
