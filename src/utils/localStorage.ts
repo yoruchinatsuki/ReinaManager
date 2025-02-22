@@ -31,16 +31,16 @@ export function insertGame(game: GameData): void {
 }
 
 // 删除一条游戏数据
-export function deleteGame(gameId: number): void {
+export function deleteGame(gameId: string): void {
   let games = getGames();
-  games = games.filter(game => game.id !== gameId);
+  games = games.filter(game => game.game_id !== gameId);
   setGames(games);
 }
 
 // 新增：通过 id 查找本地存储中的游戏数据
-export function getGameByIdLocal(gameId: number): GameData {
+export function getGameByIdLocal(gameId: string): GameData {
   const games = getGames();
-  const game = games.find(game => game.id === gameId);
+  const game = games.find(game => game.game_id === gameId);
   return game as GameData;
 }
 

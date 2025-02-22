@@ -13,7 +13,7 @@ const App: React.FC = () => {
   const lists = games.map((game) => {
     return {
       title: game.name_cn === "" ? game.name : game.name_cn,
-      segment: String(game.id)
+      segment: game.game_id
     }
   })
   const NAVIGATION: Navigation = [
@@ -39,6 +39,8 @@ const App: React.FC = () => {
       icon: <SettingsIcon />,
     }
   ];
+
+
   return (
     <ReactRouterAppProvider navigation={NAVIGATION}>
       <Outlet />

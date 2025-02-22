@@ -7,6 +7,7 @@ export interface GameData {
     tags: string[];
     rank: number;
     score: number;
-    id: number;
+    game_id: string;
+    time: Date;
 }
 

@@ -1,0 +1,24 @@
+/* 默认状态下：限制溢出，并显示为省略号 */
+.MuiDrawer-paper .MuiListItemText-root .MuiTypography-root  {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  display: inline-block;
+  /* 保证定位基础，用于动画计算 */
+  position: relative;
+}
+
+/* 鼠标悬停时，让文字开始横向滚动 */
+.MuiDrawer-paper .MuiCollapse-vertical .MuiListItemText-root:hover .MuiTypography-root  {
+  animation: marquee 5s linear infinite;
+}
+
+/* 关键帧动画：从0滚动到负方向100%（这里100%表示全部内容宽度），
+   注意：如果内容宽度变化较大，你可能需要调整结束时的 transform 值 */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-60%);
+  }
+}

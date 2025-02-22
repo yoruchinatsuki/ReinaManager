@@ -37,7 +37,6 @@ const AddModal: React.FC = () => {
         } catch (error) {
             console.error(error);
         }
-        //TODO：数据存储本地数据库功能
     }
     const handleDirectory = async () => {
         const directory = await open({

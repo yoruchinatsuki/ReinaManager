@@ -2,14 +2,16 @@ import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import ArticleIcon from '@mui/icons-material/Article';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
+import DeleteIcon from '@mui/icons-material/Delete';
 import { useEffect } from 'react';
 import { Link } from 'react-router';
+import { useGameStore } from '@/store';
 
 interface RightMenuProps {
     isopen: boolean;
     anchorPosition?: { top: number; left: number };
     setAnchorEl: (value: null) => void;
-    id: number | null | undefined;
+    id: string | null | undefined;
 }
 
 const RightMenu: React.FC<RightMenuProps> = ({ isopen, anchorPosition, setAnchorEl, id }) => {
@@ -39,6 +41,13 @@ const RightMenu: React.FC<RightMenuProps> = ({ isopen, anchorPosition, setAnchor
         left: anchorPosition?.left ?? 0,
     };
 
+    const handleDeleteGame = async () => {
+        if (id) {
+            await useGameStore.getState().deleteGame(id);
+        }
+        setAnchorEl(null);
+    }
+
     return (
         <div
             className="fixed z-50 animate-fade-in animate-duration-200"
@@ -66,6 +75,13 @@ const RightMenu: React.FC<RightMenuProps> = ({ isopen, anchorPosition, setAnchor
                     <ArticleIcon className="mr-2" />
                     <span>进入详情页</span>
                 </Link>
+                <div
+                    className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+                    onClick={handleDeleteGame}
+                >
+                    <DeleteIcon className="mr-2" />
+                    <span>删除游戏</span>
+                </div>
                 <div className="h-[1px] bg-gray-200 my-1" />
                 <div
                     className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"

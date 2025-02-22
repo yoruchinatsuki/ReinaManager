@@ -1,4 +1,5 @@
 import http from './http'
+import { time_now } from '@/utils';
 
 // const UA = 'huoshen80/ReinaManager(https://github.com/huoshen80/ReinaManager)';
 
@@ -26,6 +27,7 @@ export async function fetchFromBgm(name: string, BGM_TOKEN: string,id?: string) 
          tags: BGMdata.tags.map((tag: { name: string }) => tag.name),
          rank: BGMdata.rating.rank,
         score: BGMdata.rating.score,
-        id: BGMdata.id
+        game_id:String(BGMdata.id),
+        time:time_now()
     }
 }

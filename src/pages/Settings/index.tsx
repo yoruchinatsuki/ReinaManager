@@ -21,6 +21,10 @@ export const Settings: React.FC = () => {
             <button type="button" onClick={() => setBGM_TOKEN(inputToken)}>
                 保存
             </button>
+            <a className="text-blue visited:text-blue"
+                target='_blank'
+                rel="noreferrer"
+                href="https://next.bgm.tv/demo/access-token/create" >获取token</a>
         </div>
     );
 };

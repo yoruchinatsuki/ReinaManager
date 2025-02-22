@@ -5,13 +5,11 @@ import Typography from '@mui/material/Typography';
 import { Avatar } from '@mui/material';
 import {
     DashboardLayout,
-    ThemeSwitcher,
     type SidebarFooterProps,
 } from '@toolpad/core/DashboardLayout';
-import { Toolbars, Toolbarsswitch } from '@/components/Toolbar';
+import { ToLibraries, Toolbars, Toolbarsswitch } from '@/components/Toolbar';
 import { SearchBox } from '@/components/SearchBox';
 import { PageContainer } from '@toolpad/core';
-
 
 function SidebarFooter({ mini }: SidebarFooterProps) {
     return (
@@ -40,7 +38,7 @@ export const Layout: React.FC = () => {
         <DashboardLayout
             slots={{
                 appTitle: CustomAppTitle,
-                toolbarActions: showTollbar ? Toolbars : ThemeSwitcher,
+                toolbarActions: showTollbar ? Toolbars : ToLibraries,
                 sidebarFooter: SidebarFooter,
             }} sidebarExpandedWidth={180} defaultSidebarCollapsed={true}
         >

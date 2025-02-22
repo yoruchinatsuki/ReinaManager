@@ -8,8 +8,9 @@ export const Detail: React.FC = () => {
     const { getGameById } = useGameStore();
     const [game, setGame] = useState<GameData | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
-    const id = Number(useLocation().pathname.split('/').pop());
+    const id = useLocation().pathname.split('/').pop();
     useEffect(() => {
+        if (!id) return;
         getGameById(id)
             .then(data => setGame(data))
             .catch(error => {

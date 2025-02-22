@@ -3,11 +3,13 @@ import type { GameData } from '@/types';
 import { 
   getGames as getGamesRepository, 
   insertGame as insertGameRepository,
-  getGameById as getGameByIdRepository
+  getGameByGameId as getGameByIdRepository,
+  deleteGame as deleteGameRepository
 } from '@/utils/repository';
 import { 
   getGames as getGamesLocal, 
   insertGame as insertGameLocal, 
+  deleteGame as deleteGameLocal,
   getBgmTokenLocal, 
   setBgmTokenLocal,
   getGameByIdLocal
@@ -20,7 +22,8 @@ interface GameStore {
     loading: boolean;
     fetchGames: () => Promise<void>;
     addGame: (game: GameData) => Promise<void>;
-    getGameById: (gameId: number) => Promise<GameData>;
+    deleteGame: (gameId: string) => Promise<void>;
+    getGameById: (gameId: string) => Promise<GameData>;
 }
 interface BGM_TOKEN {
     BGM_TOKEN: string;
@@ -28,8 +31,8 @@ interface BGM_TOKEN {
     setBGM_TOKEN: (token: string) => void;
 }
 interface CardID {
-    selectId:number;
-    setselectId:(cardId:number)=>void;
+    selectId:string;
+    setselectId:(cardId:string)=>void;
 }
 
 // 判断是否运行在 Tauri 环境（即是否有 window.__TAURI__）
@@ -95,8 +98,26 @@ export const useGameStore = create<GameStore>((set) => ({
       console.error('Error adding game:', error);
     }
   },
+
+  // 根据 gameId 删除游戏，并刷新列表
+  deleteGame: async (gameId: string): Promise<void> => {
+    try {
+      if (isTauri) {
+        await deleteGameRepository(gameId);
+      } else {
+        deleteGameLocal(gameId);
+      }
+      const data = isTauri
+        ? await getGamesRepository()
+        : await Promise.resolve(getGamesLocal());
+      set({ games: data });
+    } catch (error) {
+      console.error('删除游戏数据失败:', error);
+    }
+  },
+
   // 新增：根据 id 获取游戏资料
-  getGameById: async (gameId: number): Promise<GameData> => {
+  getGameById: async (gameId: string): Promise<GameData> => {
     if (isTauri) {
       return await getGameByIdRepository(gameId);
     }
@@ -105,8 +126,8 @@ export const useGameStore = create<GameStore>((set) => ({
 }));
 
 export const useRightMenu=create<CardID>((set)=>({
-    selectId:-1,
-    setselectId:(cardId:number)=>{
+    selectId:"",
+    setselectId:(cardId:string)=>{
         set({selectId:cardId})
     }
 }))

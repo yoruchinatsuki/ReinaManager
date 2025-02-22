@@ -38,6 +38,7 @@ const SortModal: React.FC = () => {
             >
                 <DialogTitle>排序</DialogTitle>
                 <DialogContent>
+                    排序方法：
                     <SortOption />
                     <UpDownSwitches />
                 </DialogContent>
@@ -52,10 +53,10 @@ const SortModal: React.FC = () => {
 const SortOption = () => {
     return (
         <div>
-            <Select defaultValue={10}>
-                <MenuItem value={10}>Ten</MenuItem>
-                <MenuItem value={20}>Twenty</MenuItem>
-                <MenuItem value={30}>aaaa</MenuItem>
+            <Select defaultValue={"添加时间(默认)"}>
+                <MenuItem value={"添加时间(默认)"} >添加时间(默认)</MenuItem>
+                <MenuItem value={20}>游戏发布时间</MenuItem>
+                <MenuItem value={30}>BGM评分</MenuItem>
             </Select>
         </div>
     );

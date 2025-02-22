@@ -7,7 +7,8 @@ export async function initDatabase() {
   // 创建存储游戏数据的表，注意将 tags 以 JSON 字符串形式存储
   await db.execute(`
     CREATE TABLE IF NOT EXISTS games (
-      id INTEGER PRIMARY KEY,
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      game_id TEXT,
       date TEXT,
       image TEXT,
       summary TEXT,
@@ -15,7 +16,8 @@ export async function initDatabase() {
       name_cn TEXT,
       tags TEXT,
       rank INTEGER,
-      score REAL
+      score REAL,
+      time TEXT
     );
   `);
 

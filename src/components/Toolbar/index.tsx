@@ -4,9 +4,12 @@ import Stack from '@mui/material/Stack';
 import { ThemeSwitcher } from '@toolpad/core/DashboardLayout';
 // import { useLocation } from 'react-router';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import GamesIcon from '@mui/icons-material/Games';
 import AddModal from '@/components/AddModal';
 import SortModal from '@/components/SortModal';
 import FilterModal from '@/components/FilterModal';
+import { Link } from 'react-router';
+
 
 export const useModal = () => {
     const [isopen, setisopen] = useState(false);
@@ -39,24 +42,26 @@ export const Toolbarsswitch = (path: string) => {
         (path === "/libraries")
     );
 }
-const Buttongroup = () => {
-    // const location = useLocation();
-    // const pagepath = location.pathname;
+export const ToLibraries = () => {
+    return (
+        <>
+            <Link className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer no-underline text-blue visited:text-blue"
+                to={'/libraries'}>
+                <GamesIcon />
+                <span>返回游戏库</span>
+            </Link >
+            <ThemeSwitcher />
+        </>
+    );
+}
 
+const Buttongroup = () => {
     return (
         <>
             <Button startIcon={<PlayArrowIcon />}>启动游戏</Button>
             <AddModal />
             <SortModal />
             <FilterModal />
-            {/* {pagepath !== '/' &&
-                <div>
-                    <Button startIcon={<PlayArrowIcon />}>启动游戏</Button>
-                    <AddModal />
-                    <SortModal />
-                    <FilterModal />
-                </div>
-            } */}
         </>
     );
 }

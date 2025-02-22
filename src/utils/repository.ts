@@ -8,11 +8,11 @@ export async function insertGame(game: GameData) {
   const db = await getDb();
   await db.execute(
     `
-    INSERT INTO games (id, date, image, summary, name, name_cn, tags, rank, score)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);
+    INSERT INTO games (game_id, date, image, summary, name, name_cn, tags, rank, score, time)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?);
     `,
     [
-      game.id,
+      game.game_id,
       game.date,
       game.image,
       game.summary,
@@ -20,7 +20,8 @@ export async function insertGame(game: GameData) {
       game.name_cn,
       JSON.stringify(game.tags),
       game.rank,
-      game.score
+      game.score,
+      game.time
     ]
   );
 }
@@ -29,7 +30,7 @@ export async function insertGame(game: GameData) {
 export async function getGames(): Promise<GameData[]> {
   const db = await getDb();
   const rows = await db.select<GameData[]>(`
-    SELECT id, date, image, summary, name, name_cn, tags, rank, score FROM games;
+    SELECT id, game_id, date, image, summary, name, name_cn, tags, rank, score, time FROM games;
   `);
   return rows.map(row => ({
     ...row,
@@ -37,15 +38,19 @@ export async function getGames(): Promise<GameData[]> {
   }));
 }
 
-// 查找指定 ID 的游戏数据
-export async function getGameById(gameId: number): Promise<GameData> {
+// 按 game_id 文本标识查找游戏数据
+export async function getGameByGameId(gameId: string): Promise<GameData> {
   const db = await getDb();
   const rows = await db.select<GameData[]>(`
-    SELECT id, date, image, summary, name, name_cn, tags, rank, score 
+    SELECT id, game_id, date, image, summary, name, name_cn, tags, rank, score, time
     FROM games 
-    WHERE id = ? 
+    WHERE game_id = ? 
     LIMIT 1;
   `, [gameId]);
+
+  if (!rows || rows.length === 0) {
+    throw new Error('未找到对应的游戏数据');
+  }
 
   const game = rows[0];
   return {
@@ -54,7 +59,7 @@ export async function getGameById(gameId: number): Promise<GameData> {
   };
 }
 // 示例：删除游戏记录
-export async function deleteGame(gameId: number) {
+export async function deleteGame(gameId: string) {
   const db = await getDb();
-  await db.execute("DELETE FROM games WHERE id = ?;", [gameId]);
+  await db.execute("DELETE FROM games WHERE game_id = ?;", [gameId]);
 }

@@ -6,16 +6,17 @@ import RightMenu from '@/components/RightMenu';
 import { useGameStore } from '@/store';
 
 const Cards = () => {
-    const [selectedCard, setSelectedCard] = useState(-1);
+    const [selectedCard, setSelectedCard] = useState("");
     const [menuPosition, setMenuPosition] = useState<{
         mouseX: number;
         mouseY: number;
-        cardId: number | null;
+        cardId: string | null;
     } | null>(null);
     // const { setselectId } = useRightMenu();
 
     const { games } = useGameStore();
-    const handleContextMenu = (event: React.MouseEvent, cardId: number) => {
+
+    const handleContextMenu = (event: React.MouseEvent, cardId: string) => {
         setMenuPosition({
             mouseX: event.clientX,
             mouseY: event.clientY,
@@ -35,15 +36,15 @@ const Cards = () => {
                     if (!value) setMenuPosition(null);
                 }} />
             {games.map((card) => {
-                const isActive = selectedCard === card.id; // 判断当前卡片是否被选中
+                const isActive = selectedCard === card.game_id; // 判断当前卡片是否被选中
                 return (
                     <Card
-                        key={card.id}
+                        key={card.game_id}
                         className={`min-w-24 max-w-full ${isActive ? 'scale-y-105' : ''}`}
-                        onContextMenu={(e) => handleContextMenu(e, card.id)}
+                        onContextMenu={(e) => handleContextMenu(e, card.game_id)}
                     >
                         <CardActionArea
-                            onClick={() => setSelectedCard(card.id)}
+                            onClick={() => setSelectedCard(card.game_id)}
                             className={`
                              duration-100 
                             hover:shadow-lg hover:scale-105 
