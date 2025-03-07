@@ -5,11 +5,10 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
+import Select, { type SelectChangeEvent } from '@mui/material/Select';
 import SwapVertIcon from '@mui/icons-material/SwapVert';
 import { useModal } from '@/components/Toolbar';
 import Switch from '@mui/material/Switch';
-
 
 const SortModal: React.FC = () => {
     const { isopen, handleOpen, handleClose } = useModal();
@@ -51,12 +50,16 @@ const SortModal: React.FC = () => {
     );
 }
 const SortOption = () => {
+    const [sort, setSort] = useState("addtime");
+    const handleChange = (event: SelectChangeEvent) => {
+        setSort(event.target.value);
+    };
     return (
         <div>
-            <Select defaultValue={"添加时间(默认)"}>
-                <MenuItem value={"添加时间(默认)"} >添加时间(默认)</MenuItem>
-                <MenuItem value={20}>游戏发布时间</MenuItem>
-                <MenuItem value={30}>BGM评分</MenuItem>
+            <Select defaultValue={sort} onChange={handleChange}>
+                <MenuItem value={"addtime"} >添加时间(默认)</MenuItem>
+                <MenuItem value={"datetime"}>游戏发布时间</MenuItem>
+                <MenuItem value={"rank"}>BGM评分</MenuItem>
             </Select>
         </div>
     );
@@ -70,12 +73,13 @@ const UpDownSwitches = () => {
 
     return (
         <>
+            <span>升序</span>
             <Switch
                 checked={updown}
                 onChange={handleChange}
                 inputProps={{ 'aria-label': 'controlled' }}
             />
-            {updown ? "升序" : "降序"}
+            <span>降序</span>
         </>
     );
 }

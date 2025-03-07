@@ -30,10 +30,6 @@ interface BGM_TOKEN {
     fetchBgmToken: () => Promise<void>;
     setBGM_TOKEN: (token: string) => void;
 }
-interface CardID {
-    selectId:string;
-    setselectId:(cardId:string)=>void;
-}
 
 // 判断是否运行在 Tauri 环境（即是否有 window.__TAURI__）
 export const isTauri = typeof window !== 'undefined' && '__TAURI__' in window && !!window.__TAURI__
@@ -76,7 +72,7 @@ export const useGameStore = create<GameStore>((set) => ({
         : await Promise.resolve(getGamesLocal());
       set({ games: data });
     } catch (error) {
-      console.error('Error fetching games:', error);
+      console.error('Error fetching games:', error); 
       set({ games: [] });
     } finally {
       set({ loading: false });
@@ -125,12 +121,6 @@ export const useGameStore = create<GameStore>((set) => ({
   }
 }));
 
-export const useRightMenu=create<CardID>((set)=>({
-    selectId:"",
-    setselectId:(cardId:string)=>{
-        set({selectId:cardId})
-    }
-}))
 // 提供一个初始化函数，等待所有 store 初始化完成
 export const initializeStores = async (): Promise<void> => {
   await Promise.all([
