@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useBGM_TOKEN } from '@/store';
+import { openurl } from '@/utils';
 
 export const Settings: React.FC = () => {
     const { BGM_TOKEN, setBGM_TOKEN } = useBGM_TOKEN();
@@ -9,6 +10,9 @@ export const Settings: React.FC = () => {
         setInputToken(BGM_TOKEN);
     }, [BGM_TOKEN]);
 
+    const handleOpen = () => {
+        openurl("https://next.bgm.tv/demo/access-token/create");
+    }
     return (
         <div>
             <span>BGM_TOKEN</span>
@@ -21,10 +25,7 @@ export const Settings: React.FC = () => {
             <button type="button" onClick={() => setBGM_TOKEN(inputToken)}>
                 保存
             </button>
-            <a className="text-blue visited:text-blue"
-                target='_blank'
-                rel="noreferrer"
-                href="https://next.bgm.tv/demo/access-token/create" >获取token</a>
+            <span className=" text-blue-400 hover:cursor-pointer" onClick={handleOpen}>获取token</span>
         </div>
     );
 };

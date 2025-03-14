@@ -1,3 +1,5 @@
+import { openUrl } from '@tauri-apps/plugin-opener';
+import { isTauri } from '@/store';
 
 export const time_now=()=>{
     // 获取当前时间
@@ -25,4 +27,12 @@ return currentDate;
 
 // console.log(`当前时间：${year}-${month}-${date}${hours}:${minutes}:${seconds}`);
 
+}
+
+export async function openurl(url: string) {
+  if (isTauri) {
+    await openUrl(url)
+  } else {
+    window.open(url, '_blank')
+  }
 }

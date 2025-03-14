@@ -8,6 +8,20 @@
   "permissions": [
     "dialog:default",
     "sql:default",
-    "sql:allow-execute"
+    "sql:allow-execute",
+    "opener:default",
+    "fs:default",
+    {
+      "identifier": "fs:scope",
+      "allow": [
+        {
+          "path": "$APPDATA"
+        },
+        {
+          "path": "$APPDATA/**"
+        }
+      ]
+    }
+    
   ]
 }

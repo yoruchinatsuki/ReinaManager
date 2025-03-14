@@ -1,6 +1,15 @@
 import Database  from '@tauri-apps/plugin-sql';
+import { exists, BaseDirectory,mkdir } from '@tauri-apps/plugin-fs';
+
 
 export async function initDatabase() {
+ const existsdata= await exists('data', { baseDir: BaseDirectory.AppData });
+  if(!existsdata){
+    await mkdir('data', {
+  baseDir: BaseDirectory.AppData,
+});
+  }
+
   // 加载 SQLite 数据库，如果不存在则会自动创建
   const db = await Database.load('sqlite:data/reina_manager.db');
 
