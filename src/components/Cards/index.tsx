@@ -3,7 +3,7 @@ import Card from '@mui/material/Card';
 import CardMedia from '@mui/material/CardMedia';
 import CardActionArea from '@mui/material/CardActionArea';
 import RightMenu from '@/components/RightMenu';
-import { useGameStore } from '@/store';
+import { useStore } from '@/store';
 
 const Cards = () => {
     const [selectedCard, setSelectedCard] = useState("");
@@ -14,7 +14,7 @@ const Cards = () => {
     } | null>(null);
     // const { setselectId } = useRightMenu();
 
-    const { games } = useGameStore();
+    const { games } = useStore();
 
     const handleContextMenu = (event: React.MouseEvent, cardId: string) => {
         setMenuPosition({

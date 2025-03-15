@@ -6,10 +6,10 @@ import { ReactRouterAppProvider } from '@toolpad/core/react-router'
 import HomeIcon from '@mui/icons-material/Home';
 import GamesIcon from '@mui/icons-material/Games';
 import SettingsIcon from '@mui/icons-material/Settings';
-import { useGameStore } from './store';
+import { useStore } from './store';
 
 const App: React.FC = () => {
-  const { games } = useGameStore();
+  const { games } = useStore();
   const lists = games.map((game) => {
     return {
       title: game.name_cn === "" ? game.name : game.name_cn,

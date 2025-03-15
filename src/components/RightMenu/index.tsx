@@ -5,7 +5,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useEffect } from 'react';
 import { Link } from 'react-router';
-import { useGameStore } from '@/store';
+import { useStore } from '@/store';
 
 interface RightMenuProps {
     isopen: boolean;
@@ -43,7 +43,7 @@ const RightMenu: React.FC<RightMenuProps> = ({ isopen, anchorPosition, setAnchor
 
     const handleDeleteGame = async () => {
         if (id) {
-            await useGameStore.getState().deleteGame(id);
+            await useStore.getState().deleteGame(id);
         }
         setAnchorEl(null);
     }

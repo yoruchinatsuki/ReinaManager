@@ -1,11 +1,11 @@
-import { useGameStore } from '@/store';
+import { useStore } from '@/store';
 import { PageContainer } from '@toolpad/core';
 import { useLocation } from 'react-router';
 import type { GameData } from '@/types';
 import { useEffect, useState } from 'react';
 export const Detail: React.FC = () => {
 
-    const { getGameById } = useGameStore();
+    const { getGameById } = useStore();
     const [game, setGame] = useState<GameData | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const id = useLocation().pathname.split('/').pop();
@@ -26,6 +26,12 @@ export const Detail: React.FC = () => {
             <div>
                 <h3>简介</h3>
                 <p>{game.summary}</p>
+                <h3>游戏评分</h3>
+                <p>{game.score}</p>
+                <h3>游戏发布时间</h3>
+                <p>{game.date}</p>
+                <h3>游戏排行</h3>
+                <p>{game.rank}</p>
             </div>
 
         </PageContainer>

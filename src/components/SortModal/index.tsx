@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -9,9 +9,35 @@ import Select, { type SelectChangeEvent } from '@mui/material/Select';
 import SwapVertIcon from '@mui/icons-material/SwapVert';
 import { useModal } from '@/components/Toolbar';
 import Switch from '@mui/material/Switch';
+import { useStore } from '@/store';
 
 const SortModal: React.FC = () => {
     const { isopen, handleOpen, handleClose } = useModal();
+    // 从 store 获取排序状态
+    const { sortOption, sortOrder, setSortOption, setSortOrder, fetchGames } = useStore();
+
+    // 本地状态，用于在对话框内部跟踪更改
+    const [localSortOption, setLocalSortOption] = useState(sortOption);
+    const [localSortOrder, setLocalSortOrder] = useState(sortOrder);
+
+    // 每次打开对话框时，重置本地状态
+    useEffect(() => {
+        if (isopen) {
+            setLocalSortOption(sortOption);
+            setLocalSortOrder(sortOrder);
+        }
+    }, [isopen, sortOption, sortOrder]);
+
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        // 更新全局状态
+        setSortOption(localSortOption);
+        setSortOrder(localSortOrder);
+        // 重新获取排序后的数据
+        await fetchGames(localSortOption, localSortOrder);
+        handleClose();
+    };
+
     return (
         <>
             <Button onClick={handleOpen} startIcon={<SwapVertIcon />}>排序</Button>
@@ -25,21 +51,20 @@ const SortModal: React.FC = () => {
                 aria-labelledby="sort-dialog-title"
                 PaperProps={{
                     component: 'form',
-                    onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
-                        event.preventDefault();
-                        const formData = new FormData(event.currentTarget);
-                        const formJson = Object.fromEntries((formData).entries());
-                        const email = formJson.email;
-                        console.log(email);
-                        handleClose();
-                    },
+                    onSubmit: handleSubmit,
                 }}
             >
                 <DialogTitle>排序</DialogTitle>
-                <DialogContent>
-                    排序方法：
-                    <SortOption />
-                    <UpDownSwitches />
+                <DialogContent sx={{ pt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <div>排序方法：</div>
+                    <SortOption
+                        value={localSortOption}
+                        onChange={setLocalSortOption}
+                    />
+                    <UpDownSwitches
+                        value={localSortOrder}
+                        onChange={(value: string) => setLocalSortOrder(value as "asc" | "desc")}
+                    />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose}>取消</Button>
@@ -49,38 +74,39 @@ const SortModal: React.FC = () => {
         </>
     );
 }
-const SortOption = () => {
-    const [sort, setSort] = useState("addtime");
+const SortOption = ({ value, onChange }: { value: string, onChange: (value: string) => void }) => {
     const handleChange = (event: SelectChangeEvent) => {
-        setSort(event.target.value);
+        onChange(event.target.value);
     };
+
     return (
         <div>
-            <Select defaultValue={sort} onChange={handleChange}>
-                <MenuItem value={"addtime"} >添加时间(默认)</MenuItem>
-                <MenuItem value={"datetime"}>游戏发布时间</MenuItem>
-                <MenuItem value={"rank"}>BGM评分</MenuItem>
+            <Select value={value} onChange={handleChange}>
+                <MenuItem value="addtime">添加时间(默认)</MenuItem>
+                <MenuItem value="datetime">游戏发布时间</MenuItem>
+                <MenuItem value="rank">BGM评分排名</MenuItem>
             </Select>
         </div>
     );
 }
-const UpDownSwitches = () => {
-    const [updown, setupdown] = useState(false);
+const UpDownSwitches = ({ value, onChange }: { value: string, onChange: (value: string) => void }) => {
+    // 使用 asc/desc 而不是布尔值
+    const isDesc = value === 'desc';
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setupdown(event.target.checked);
+        onChange(event.target.checked ? 'desc' : 'asc');
     };
 
     return (
-        <>
-            <span>升序</span>
+        <div style={{ display: 'flex', alignItems: 'center', marginTop: '10px' }}>
+            <span style={{ marginRight: '8px', opacity: isDesc ? 0.5 : 1 }}>升序</span>
             <Switch
-                checked={updown}
+                checked={isDesc}
                 onChange={handleChange}
                 inputProps={{ 'aria-label': 'controlled' }}
             />
-            <span>降序</span>
-        </>
+            <span style={{ marginLeft: '8px', opacity: isDesc ? 1 : 0.5 }}>降序</span>
+        </div>
     );
 }
 export default SortModal;

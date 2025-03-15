@@ -12,18 +12,17 @@ import { useModal } from '@/components/Toolbar';
 import { useState } from 'react';
 import { fetchFromBgm } from '@/api/bgm';
 import Alert from '@mui/material/Alert';
-import { useGameStore, useBGM_TOKEN } from '@/store/';
+import { useStore } from '@/store/';
 import { open } from '@tauri-apps/plugin-dialog';
 
 const AddModal: React.FC = () => {
-    const { BGM_TOKEN } = useBGM_TOKEN();
+    const { bgmToken, addGame } = useStore();
     const { isopen, handleOpen, handleClose } = useModal();
     const [formText, setFormText] = useState('');
     const [error, setError] = useState('');
-    const addGame = useGameStore(state => state.addGame);
     const handleSubmit = async () => {
         try {
-            const res = await fetchFromBgm(formText, BGM_TOKEN);
+            const res = await fetchFromBgm(formText, bgmToken);
             if (typeof res === 'string') {
                 setError(res);
                 setTimeout(() => {
