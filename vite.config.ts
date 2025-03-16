@@ -5,6 +5,7 @@ import UnoCSS from 'unocss/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: '/ReinaManager/',  // 将此处替换为你的仓库名称
   server: {
     // Tauri 工作于固定端口，如果端口不可用则报错
     strictPort: true,

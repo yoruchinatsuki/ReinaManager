@@ -14,7 +14,7 @@ import { useStore } from '@/store';
 const SortModal: React.FC = () => {
     const { isopen, handleOpen, handleClose } = useModal();
     // 从 store 获取排序状态
-    const { sortOption, sortOrder, setSortOption, setSortOrder, fetchGames } = useStore();
+    const { sortOption, sortOrder, setSortOption, setSortOrder } = useStore();
 
     // 本地状态，用于在对话框内部跟踪更改
     const [localSortOption, setLocalSortOption] = useState(sortOption);
@@ -34,7 +34,6 @@ const SortModal: React.FC = () => {
         setSortOption(localSortOption);
         setSortOrder(localSortOrder);
         // 重新获取排序后的数据
-        await fetchGames(localSortOption, localSortOrder);
         handleClose();
     };
 

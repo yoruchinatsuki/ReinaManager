@@ -36,7 +36,7 @@ interface AppState {
   selectedGameId: string | null;
   
   // 游戏操作方法
-  fetchGames: (sortOption?: string, sortOrder?: 'asc' | 'desc') => Promise<void>;
+  fetchGames: (sortOption?: string, sortOrder?: 'asc' | 'desc',resetSearch?:boolean) => Promise<void>;
   addGame: (game: GameData) => Promise<void>;
   deleteGame: (gameId: string) => Promise<void>;
   getGameById: (gameId: string) => Promise<GameData>;
@@ -57,9 +57,11 @@ interface AppState {
 
   searchKeyword: string;
   
-  // ...existing methods
   setSearchKeyword: (keyword: string) => void;
   searchGames: (keyword: string) => Promise<void>;
+
+  // 添加通用刷新方法
+  refreshGameData: (customSortOption?: string, customSortOrder?: 'asc' | 'desc') => Promise<void>;
 
 }
 
@@ -82,9 +84,24 @@ export const useStore = create<AppState>()(
       selectedGameId: null,
 
       searchKeyword: '',
+
+      // 添加通用的数据刷新函数，根据搜索状态执行对应操作
+      refreshGameData: async (customSortOption?: string, customSortOrder?: 'asc' | 'desc') => {
+        const { searchKeyword } = get();
+        
+        if (searchKeyword && searchKeyword.trim() !== '') {
+          // 有搜索关键字，重新执行搜索
+          await get().searchGames(searchKeyword);
+        } else {
+          // 没有搜索关键字，获取所有游戏
+          const option = customSortOption || get().sortOption;
+          const order = customSortOrder || get().sortOrder;
+          await get().fetchGames(option, order, false);
+        }
+      },
       
-       // fetchGames 函数修改，重置搜索关键字
-      fetchGames: async (sortOption?: string, sortOrder?: 'asc' | 'desc') => {
+      // 修改 fetchGames 方法，添加覆盖 searchKeyword 的选项
+      fetchGames: async (sortOption?: string, sortOrder?: 'asc' | 'desc', resetSearch?:boolean) => {
         set({ loading: true });
         try {
           const option = sortOption || get().sortOption;
@@ -94,10 +111,12 @@ export const useStore = create<AppState>()(
             ? await getGamesRepository(option, order)
             : getGamesLocal(option, order);
           
-          set({ 
-            games: data, 
-            searchKeyword: '' // 重置搜索关键字
-          });
+          // 只有在明确指定 resetSearch=true 时才重置搜索关键字
+          if (resetSearch) {
+            set({ games: data, searchKeyword: '' });
+          } else {
+            set({ games: data });
+          }
         } catch (error) {
           console.error('获取游戏数据失败:', error);
           set({ games: [] });
@@ -107,6 +126,7 @@ export const useStore = create<AppState>()(
       },
 
       
+      // 使用通用函数简化 addGame
       addGame: async (game: GameData) => {
         try {
           if (isTauri) {
@@ -114,13 +134,14 @@ export const useStore = create<AppState>()(
           } else {
             insertGameLocal(game);
           }
-          // 重新获取游戏列表
-          await get().fetchGames();
+          // 使用通用刷新函数
+          await get().refreshGameData();
         } catch (error) {
           console.error('Error adding game:', error);
         }
       },
       
+      // 使用通用函数简化 deleteGame
       deleteGame: async (gameId: string): Promise<void> => {
         try {
           if (isTauri) {
@@ -128,8 +149,8 @@ export const useStore = create<AppState>()(
           } else {
             deleteGameLocal(gameId);
           }
-          // 重新获取游戏列表
-          await get().fetchGames();
+          // 使用通用刷新函数
+          await get().refreshGameData();
         } catch (error) {
           console.error('删除游戏数据失败:', error);
         }
@@ -146,37 +167,44 @@ export const useStore = create<AppState>()(
         set({ searchKeyword: keyword });
       },
       
-      searchGames: async (keyword: string) => {
-        set({ loading: true });
-        try {
-          const option = get().sortOption;
-          const order = get().sortOrder;
-          
-          let data: GameData[];
-          if (isTauri) {
-            // 服务端搜索
-            data = await searchGamesRepository(keyword, option, order);
-          } else {
-            // 客户端搜索
-            data = searchGamesLocal(keyword, option, order);
-          }
-          
-          set({ games: data, searchKeyword: keyword });
-        } catch (error) {
-          console.error('搜索游戏数据失败:', error);
-          set({ games: [] });
-        } finally {
-          set({ loading: false });
-        }
-      },
+      // 搜索方法逻辑完善
+searchGames: async (keyword: string) => {
+  set({ loading: true, searchKeyword: keyword });
+  try {
+    const option = get().sortOption;
+    const order = get().sortOrder;
+    
+    let data: GameData[];
+    if (!keyword || keyword.trim() === '') {
+      // 如果搜索关键字为空，获取所有游戏
+      data = isTauri
+        ? await getGamesRepository(option, order)
+        : getGamesLocal(option, order);
+    } else {
+      // 正常搜索
+      data = isTauri
+        ? await searchGamesRepository(keyword, option, order)
+        : searchGamesLocal(keyword, option, order);
+    }
+    
+    set({ games: data });
+  } catch (error) {
+    console.error('搜索游戏数据失败:', error);
+    set({ games: [] });
+  } finally {
+    set({ loading: false });
+  }
+},
       
-      // 排序方法
+ // 使用通用函数简化排序方法
       setSortOption: (option: string) => {
         set({ sortOption: option });
+        get().refreshGameData(option, get().sortOrder);
       },
       
       setSortOrder: (order: 'asc' | 'desc') => {
         set({ sortOrder: order });
+        get().refreshGameData(get().sortOption, order);
       },
       
       // BGM 令牌方法

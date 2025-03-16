@@ -1,7 +1,7 @@
 # ReinaManager
 
 ![Status](https://img.shields.io/badge/status-active-brightgreen)
-![Stage](https://img.shields.io/badge/stage-alpha-orange)
+![Stage](https://img.shields.io/badge/stage-beta-blue)
 
 ##### A lightweight visual novel management ,Under development...
 
