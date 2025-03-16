@@ -6,7 +6,7 @@ import { Settings } from '@/pages/Settings';
 import Card from '@/components/Cards';
 import { Libraries } from '@/pages/Libraries';
 import { Detail } from '@/pages/Detail';
-import { createBrowserRouter, type RouteObject } from 'react-router';
+import { createHashRouter, type RouteObject } from 'react-router';
 import React from 'react';
 import Layout from '@/components/Layout';
 import App from '@/App';
@@ -75,7 +75,7 @@ const generateRoutes = (routes: RouteGroup[]): RouteObject[] => {
     );
 };
 
-export const routers = createBrowserRouter([
+export const routers = createHashRouter([
     {
         Component: App,
         children: [

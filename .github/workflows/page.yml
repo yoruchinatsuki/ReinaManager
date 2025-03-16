@@ -48,9 +48,14 @@ jobs:
         run: pnpm build
         # 注意：如果你的构建命令不是 pnpm build，请修改为实际使用的命令
 
+      # 添加这一步以创建 CNAME 文件
+      - name: Create CNAME file
+        run: echo "reina.huoshen80.top" > dist/CNAME
+
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: dist  # 根据你的构建输出目录修改，可能是 build、dist 或其他
-          branch: page  # 要部署到的分支
-          clean: true   # 每次部署前清理目标分支
+          folder: dist
+          branch: page
+          clean: true
+          single-commit: true  # 使用单个提交以避免其他文件被复制
