@@ -1,25 +1,21 @@
 <div align="center">
-
   <div style="width:200px">
-
-   [![src-tauri/icons/reina.png](src-tauri/icons/reina.png)](https://vndb.org/c64303)
-
+    <a href="https://vndb.org/c64303">
+      <img src="src-tauri/icons/reina.png" alt="Reina">
+    </a>
   </div>
 
-# ReinaManager
-
+<h1>ReinaManager</h1>
 
 ![Status](https://img.shields.io/badge/status-active-brightgreen) ![Stage](https://img.shields.io/badge/stage-beta-blue)
 
-<p align="center"> <a href="./README.md">English</a>|中文 <p>
+<p align="center"><a href="./README.md">English</a>|中文</p>
 
-##### 一个轻量级的视觉小说管理工具，正在开发中...
+<h5>一个轻量级的视觉小说管理工具，正在开发中...</h5>
 
-名称中的 `Reina` 来源于游戏 [**金色ラブリッチェ(Kin'iro Loveriche)**](https://vndb.org/v21852) 中的角色 [**妃 玲奈(Kisaki Reina)**](https://vndb.org/c64303)
+名称中的 `Reina` 来源于游戏 <a href="https://vndb.org/v21852"><b>金色ラブリッチェ(Kin'iro Loveriche)</b></a> 中的角色 <a href="https://vndb.org/c64303"><b>妃 玲奈(Kisaki Reina)</b></a>
 
 </div>
-
-
 
 ## 技术栈
 

@@ -1,21 +1,21 @@
 <div align="center">
-
   <div style="width:200px">
-
-   [![src-tauri/icons/reina.png](src-tauri/icons/reina.png)](https://vndb.org/c64303)
-
+    <a href="https://vndb.org/c64303">
+      <img src="src-tauri/icons/reina.png" alt="Reina">
+    </a>
   </div>
-# ReinaManager
+
+<h1>ReinaManager</h1>
 
 ![Status](https://img.shields.io/badge/status-active-brightgreen) ![Stage](https://img.shields.io/badge/stage-beta-blue)
 
 <p align="center">English|<a href="./README.zh_CN.md">中文</a></p>
-##### A lightweight visual novel management ,Under development...
 
-The `Reina` in the name is  the character [**妃 玲奈(Kisaki Reina)**](https://vndb.org/c64303) from game [**金色ラブリッチェ(Kin'iro Loveriche)**](https://vndb.org/v21852)
+<h5>A lightweight visual novel management ,Under development...</h5>
+
+The `Reina` in the name is the character <a href="https://vndb.org/c64303"><b>妃 玲奈(Kisaki Reina)</b></a> from game <a href="https://vndb.org/v21852"><b>金色ラブリッチェ(Kin'iro Loveriche)</b></a>
 
 </div>
-
 
 ## Stacks
 
