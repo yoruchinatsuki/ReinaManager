@@ -9,7 +9,9 @@
     "dialog:default",
     "sql:default",
     "sql:allow-execute",
-    "opener:default",
+    "core:path:default",
+    "core:path:allow-dirname",
+    "shell:allow-open",
     "fs:default",
     {
       "identifier": "fs:scope",
@@ -22,6 +24,5 @@
         }
       ]
     }
-    
   ]
 }

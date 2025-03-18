@@ -6,8 +6,8 @@ export async function insertGame(game: GameData) {
   const db = await getDb();
   await db.execute(
     `
-    INSERT INTO games (game_id, date, image, summary, name, name_cn, tags, rank, score, time)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?);
+    INSERT INTO games (game_id, date, image, summary, name, name_cn, tags, rank, score, time, localpath)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?,?);
     `,
     [
       game.game_id,
@@ -19,7 +19,8 @@ export async function insertGame(game: GameData) {
       JSON.stringify(game.tags),
       game.rank,
       game.score,
-      game.time
+      game.time,
+      game.localpath
     ]
   );
 }
@@ -50,7 +51,7 @@ export async function getGames(sortOption = 'addtime', sortOrder: 'asc' | 'desc'
   }
   
   const rows = await db.select<GameData[]>(`
-    SELECT id, game_id, date, image, summary, name, name_cn, tags, rank, score, time FROM games
+    SELECT id, game_id, date, image, summary, name, name_cn, tags, rank, score, time, localpath FROM games
     ORDER BY ${sortField} ${sortDirection};
   `);
   
@@ -64,7 +65,7 @@ export async function getGames(sortOption = 'addtime', sortOrder: 'asc' | 'desc'
 export async function getGameByGameId(gameId: string): Promise<GameData> {
   const db = await getDb();
   const rows = await db.select<GameData[]>(`
-    SELECT id, game_id, date, image, summary, name, name_cn, tags, rank, score, time
+    SELECT id, game_id, date, image, summary, name, name_cn, tags, rank, score, time, localpath
     FROM games 
     WHERE game_id = ? 
     LIMIT 1;
@@ -121,7 +122,7 @@ export async function searchGames(
   // 使用LIKE进行模糊搜索，优先搜索name_cn，为空则搜索name
   const searchKeyword = `%${keyword}%`;
   const rows = await db.select<GameData[]>(`
-    SELECT id, game_id, date, image, summary, name, name_cn, tags, rank, score, time 
+    SELECT id, game_id, date, image, summary, name, name_cn, tags, rank, score, time ,localpath 
     FROM games
     WHERE 
       (name_cn LIKE ? OR (name_cn IS NULL OR name_cn = '') AND name LIKE ?)

@@ -18,9 +18,7 @@ import {
   searchGamesLocal
 } from '@/utils/localStorage';
 import { getBgmTokenRepository, setBgmTokenRepository } from '@/utils/settingsConfig';
-
-// 判断是否运行在 Tauri 环境
-export const isTauri = typeof window !== 'undefined' && '__TAURI__' in window && !!window.__TAURI__;
+import { isTauri } from '@tauri-apps/api/core';
 
 // 定义应用全局状态类型
 interface AppState {
@@ -107,7 +105,7 @@ export const useStore = create<AppState>()(
           const option = sortOption || get().sortOption;
           const order = sortOrder || get().sortOrder;
           
-          const data = isTauri
+          const data = isTauri()
             ? await getGamesRepository(option, order)
             : getGamesLocal(option, order);
           
@@ -129,7 +127,7 @@ export const useStore = create<AppState>()(
       // 使用通用函数简化 addGame
       addGame: async (game: GameData) => {
         try {
-          if (isTauri) {
+          if (isTauri()) {
             await insertGameRepository(game);
           } else {
             insertGameLocal(game);
@@ -144,20 +142,21 @@ export const useStore = create<AppState>()(
       // 使用通用函数简化 deleteGame
       deleteGame: async (gameId: string): Promise<void> => {
         try {
-          if (isTauri) {
+          if (isTauri()) {
             await deleteGameRepository(gameId);
           } else {
             deleteGameLocal(gameId);
           }
           // 使用通用刷新函数
           await get().refreshGameData();
+          get().setSelectedGameId(null);
         } catch (error) {
           console.error('删除游戏数据失败:', error);
         }
       },
       
       getGameById: async (gameId: string): Promise<GameData> => {
-        if (isTauri) {
+        if (isTauri()) {
           return await getGameByIdRepository(gameId);
         }
         return await Promise.resolve(getGameByIdLocal(gameId));
@@ -177,12 +176,12 @@ searchGames: async (keyword: string) => {
     let data: GameData[];
     if (!keyword || keyword.trim() === '') {
       // 如果搜索关键字为空，获取所有游戏
-      data = isTauri
+      data = isTauri()
         ? await getGamesRepository(option, order)
         : getGamesLocal(option, order);
     } else {
       // 正常搜索
-      data = isTauri
+      data = isTauri()
         ? await searchGamesRepository(keyword, option, order)
         : searchGamesLocal(keyword, option, order);
     }
@@ -211,7 +210,7 @@ searchGames: async (keyword: string) => {
       fetchBgmToken: async () => {
         try {
           let token = '';
-          if (isTauri) {
+          if (isTauri()) {
             token = await getBgmTokenRepository();
           } else {
             token = getBgmTokenLocal();
@@ -224,7 +223,7 @@ searchGames: async (keyword: string) => {
       
       setBgmToken: async (token: string) => {
         try {
-          if (isTauri) {
+          if (isTauri()) {
             await setBgmTokenRepository(token);
           } else {
             setBgmTokenLocal(token);

@@ -2,14 +2,14 @@ import { useState, useRef } from 'react';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import { ThemeSwitcher } from '@toolpad/core/DashboardLayout';
-// import { useLocation } from 'react-router';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import GamesIcon from '@mui/icons-material/Games';
 import AddModal from '@/components/AddModal';
 import SortModal from '@/components/SortModal';
 import FilterModal from '@/components/FilterModal';
 import { Link } from 'react-router';
-
+import { useStore } from '@/store';
+import { invoke } from '@tauri-apps/api/core';
 
 export const useModal = () => {
     const [isopen, setisopen] = useState(false);
@@ -56,9 +56,40 @@ export const ToLibraries = () => {
 }
 
 const Buttongroup = () => {
+    const { selectedGameId, getGameById } = useStore();
+
+    const handleStartGame = async () => {
+        if (!selectedGameId) {
+            console.error('未选择游戏');
+            return;
+        }
+
+        try {
+
+            const selectedGame = await getGameById(selectedGameId);
+            if (!selectedGame || !selectedGame.localpath) {
+                console.error('游戏路径未找到');
+                return;
+            }
+
+            // 调用Rust后端启动游戏
+            await invoke('launch_game', {
+                gamePath: selectedGame.localpath,
+            });
+        } catch (error) {
+            console.error('游戏启动失败:', error);
+            // 这里可以添加错误提示UI
+        }
+    }
+
     return (
         <>
-            <Button startIcon={<PlayArrowIcon />}>启动游戏</Button>
+            <Button startIcon={<PlayArrowIcon />}
+                onClick={handleStartGame}
+                disabled={!selectedGameId} // 当没有选择游戏时禁用按钮
+            >
+                启动游戏
+            </Button>
             <AddModal />
             <SortModal />
             <FilterModal />

@@ -33,7 +33,8 @@ export async function initDatabase() {
       tags TEXT,
       rank INTEGER,
       score REAL,
-      time TEXT
+      time TEXT,
+      localpath TEXT
     );
   `);
 

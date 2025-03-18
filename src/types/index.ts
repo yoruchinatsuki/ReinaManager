@@ -10,5 +10,6 @@ export interface GameData {
     score: number;
     game_id: string;
     time: Date;
+    localpath?: string;
 }
 

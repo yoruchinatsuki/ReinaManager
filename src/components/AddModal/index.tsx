@@ -4,24 +4,37 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
 import AddIcon from '@mui/icons-material/Add';
 import FileOpenIcon from '@mui/icons-material/FileOpen';
 import { useModal } from '@/components/Toolbar';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { fetchFromBgm } from '@/api/bgm';
 import Alert from '@mui/material/Alert';
 import { useStore } from '@/store/';
 import { open } from '@tauri-apps/plugin-dialog';
+import CircularProgress from '@mui/material/CircularProgress';
+import { isTauri } from '@tauri-apps/api/core';
 
 const AddModal: React.FC = () => {
-    const { bgmToken, addGame } = useStore();
+    const { bgmToken, addGame, games } = useStore();
     const { isopen, handleOpen, handleClose } = useModal();
     const [formText, setFormText] = useState('');
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [path, setPath] = useState('');
+
+    // 当路径变化时，更新文本字段
+    useEffect(() => {
+        if (path) {
+            const folderName = extractFolderName(path);
+            setFormText(folderName);
+        }
+    }, [path]); // 仅在path变化时执行
+
     const handleSubmit = async () => {
+        if (loading) return; // 防止重复提交
         try {
+            setLoading(true); // 开始加载
             const res = await fetchFromBgm(formText, bgmToken);
             if (typeof res === 'string') {
                 setError(res);
@@ -30,24 +43,44 @@ const AddModal: React.FC = () => {
                 }, 5000);
                 return null;
             }
-            await addGame(res);
-            handleClose();
+            if (games.find((game) => game.game_id === res.game_id)) {
+                setError('游戏已存在');
+                setTimeout(() => {
+                    setError('');
+                }, 5000);
+                return null;
+            }
+            const gameWithPath = { ...res, localpath: path }; // 创建包含原对象所有属性和新 path 属性的新对象
+            console.log(gameWithPath);
+            await addGame(gameWithPath);
             setFormText('');
+            setPath('');
+            handleClose();
         } catch (error) {
             console.error(error);
+        } finally {
+            setLoading(false); // 结束加载状态
         }
     }
     const handleDirectory = async () => {
-        const directory = await open({
+        const path = await open({
             multiple: false,
             directory: false,
             filters: [{
-                name: "",
+                name: "可执行文件",
                 extensions: ["exe"]
             }]
         });
-        return directory
+        if (path === null) return null;
+        return path
     }
+
+    // 从文件路径中提取文件夹名称
+    const extractFolderName = (path: string): string => {
+        // 返回倒数第二个元素（文件所在的文件夹）
+        const parts = path.split('\\');
+        return parts.length > 1 ? parts[parts.length - 2] : '';
+    };
 
     return (
         <>
@@ -55,7 +88,7 @@ const AddModal: React.FC = () => {
             <Dialog
                 open={isopen}
                 onClose={(_, reason) => {
-                    if (reason !== 'backdropClick') {
+                    if (reason !== 'backdropClick' && !loading) { // 加载时防止关闭
                         handleClose();
                     }
                 }}
@@ -65,10 +98,17 @@ const AddModal: React.FC = () => {
                 {error && <Alert severity="error">{error}</Alert>}
                 <DialogTitle>添加游戏</DialogTitle>
                 <DialogContent>
-                    <Button variant='contained' onClick={async () => {
-                        console.log(await handleDirectory());
-                    }} startIcon={<FileOpenIcon />} >选择启动程序</Button>
-                    <SelectGameProgram />
+                    <Button className='w-md' variant='contained' onClick={async () => {
+                        const result = await handleDirectory();
+                        if (result)
+                            setPath(
+                                result
+                            );
+                    }} startIcon={<FileOpenIcon />} disabled={!isTauri()} >选择启动程序</Button>
+                    <p>
+                        <input className='w-md' type="text" value={path}
+                            placeholder="请选择一个可执行程序" readOnly />
+                    </p>
                     <TextField
                         required
                         margin="dense"
@@ -79,29 +119,31 @@ const AddModal: React.FC = () => {
                         fullWidth
                         variant="standard"
                         autoComplete="off"
+                        value={formText}
                         onChange={(event) => setFormText(event.target.value)}
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button variant="outlined" onClick={handleClose}>取消</Button>
-                    <Button variant="contained" onClick={handleSubmit} disabled={formText === ''}>确认</Button>
+                    <Button variant="outlined" onClick={() => {
+                        setFormText('');
+                        setPath('');
+                        handleClose();
+                    }
+
+                    } disabled={loading} >取消</Button>
+                    <Button
+                        variant="contained"
+                        onClick={handleSubmit}
+                        disabled={formText === '' || loading}
+                        startIcon={loading ? <CircularProgress size={20} /> : null}
+                    >
+                        {loading ? '处理中...' : '确认'}
+                    </Button>
                 </DialogActions>
             </Dialog>
         </>
     );
 }
 
-
-const SelectGameProgram = () => {
-    return (
-        <div>
-            <Select defaultValue={10}>
-                <MenuItem value={10}>Ten</MenuItem>
-                <MenuItem value={20}>Twenty</MenuItem>
-                <MenuItem value={30}>aaaa</MenuItem>
-            </Select>
-        </div>
-    );
-}
 
 export default AddModal;

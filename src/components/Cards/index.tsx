@@ -6,13 +6,13 @@ import RightMenu from '@/components/RightMenu';
 import { useStore } from '@/store';
 
 const Cards = () => {
-    const [selectedCard, setSelectedCard] = useState("");
+    const { selectedGameId, setSelectedGameId } = useStore();
+    // const [selectedCard, setSelectedCard] = useState("");
     const [menuPosition, setMenuPosition] = useState<{
         mouseX: number;
         mouseY: number;
         cardId: string | null;
     } | null>(null);
-    // const { setselectId } = useRightMenu();
 
     const { games } = useStore();
 
@@ -22,6 +22,7 @@ const Cards = () => {
             mouseY: event.clientY,
             cardId
         });
+        setSelectedGameId(cardId);
     };
 
     return (
@@ -36,7 +37,7 @@ const Cards = () => {
                     if (!value) setMenuPosition(null);
                 }} />
             {games.map((card) => {
-                const isActive = selectedCard === card.game_id; // 判断当前卡片是否被选中
+                const isActive = selectedGameId === card.game_id; // 判断当前卡片是否被选中
                 return (
                     <Card
                         key={card.game_id}
@@ -44,7 +45,7 @@ const Cards = () => {
                         onContextMenu={(e) => handleContextMenu(e, card.game_id)}
                     >
                         <CardActionArea
-                            onClick={() => setSelectedCard(card.game_id)}
+                            onClick={() => setSelectedGameId(card.game_id)}
                             className={`
                              duration-100 
                             hover:shadow-lg hover:scale-105 
