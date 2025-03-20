@@ -22,6 +22,7 @@ import { isTauri } from '@tauri-apps/api/core';
 
 // 定义应用全局状态类型
 interface AppState {
+  updateSort(option: string, sortOrder: string): Promise<void>;
   // 游戏相关状态与方法
   games: GameData[];
   loading: boolean;
@@ -83,20 +84,33 @@ export const useStore = create<AppState>()(
 
       searchKeyword: '',
 
-      // 添加通用的数据刷新函数，根据搜索状态执行对应操作
-      refreshGameData: async (customSortOption?: string, customSortOrder?: 'asc' | 'desc') => {
-        const { searchKeyword } = get();
-        
-        if (searchKeyword && searchKeyword.trim() !== '') {
-          // 有搜索关键字，重新执行搜索
-          await get().searchGames(searchKeyword);
-        } else {
-          // 没有搜索关键字，获取所有游戏
-          const option = customSortOption || get().sortOption;
-          const order = customSortOrder || get().sortOrder;
-          await get().fetchGames(option, order, false);
-        }
-      },
+      // 优化刷新数据的方法，减少状态更新
+refreshGameData: async (customSortOption?: string, customSortOrder?: 'asc' | 'desc') => {
+  set({ loading: true });
+  
+  try {
+    const { searchKeyword } = get();
+    const option = customSortOption || get().sortOption;
+    const order = customSortOrder || get().sortOrder;
+    
+    let data: GameData[];
+    if (searchKeyword && searchKeyword.trim() !== '') {
+      data = isTauri()
+        ? await searchGamesRepository(searchKeyword, option, order)
+        : searchGamesLocal(searchKeyword, option, order);
+    } else {
+      data = isTauri()
+        ? await getGamesRepository(option, order)
+        : getGamesLocal(option, order);
+    }
+    
+    // 一次性设置数据和状态
+    set({ games: data, loading: false });
+  } catch (error) {
+    console.error('刷新游戏数据失败:', error);
+    set({ loading: false });
+  }
+},
       
       // 修改 fetchGames 方法，添加覆盖 searchKeyword 的选项
       fetchGames: async (sortOption?: string, sortOrder?: 'asc' | 'desc', resetSearch?:boolean) => {
@@ -195,16 +209,51 @@ searchGames: async (keyword: string) => {
   }
 },
       
- // 使用通用函数简化排序方法
-      setSortOption: (option: string) => {
-        set({ sortOption: option });
-        get().refreshGameData(option, get().sortOrder);
-      },
-      
-      setSortOrder: (order: 'asc' | 'desc') => {
-        set({ sortOrder: order });
-        get().refreshGameData(get().sortOption, order);
-      },
+// 添加一个统一的排序更新函数，合并所有状态更新
+updateSort: async (option: string, order: 'asc' | 'desc') => {
+  set({ loading: true }); // 立即进入加载状态，防止闪烁
+  
+  try {
+    const { searchKeyword } = get();
+    let data: GameData[];
+    
+    // 直接获取新排序的数据
+    if (searchKeyword && searchKeyword.trim() !== '') {
+      data = isTauri()
+        ? await searchGamesRepository(searchKeyword, option, order)
+        : searchGamesLocal(searchKeyword, option, order);
+    } else {
+      data = isTauri()
+        ? await getGamesRepository(option, order)
+        : getGamesLocal(option, order);
+    }
+    
+    // 一次性更新所有状态
+    set({ 
+      sortOption: option,
+      sortOrder: order,
+      games: data,
+      loading: false
+    });
+  } catch (error) {
+    console.error('更新排序失败:', error);
+    // 更新排序选项，即使数据获取失败
+    set({ 
+      sortOption: option, 
+      sortOrder: order, 
+      loading: false 
+    });
+  }
+},
+
+// 修改这两个方法，让它们调用新的 updateSort 方法
+setSortOption: (option: string) => {
+  get().updateSort(option, get().sortOrder);
+},
+
+setSortOrder: (order: 'asc' | 'desc') => {
+  get().updateSort(get().sortOption, order);
+},
       
       // BGM 令牌方法
       fetchBgmToken: async () => {

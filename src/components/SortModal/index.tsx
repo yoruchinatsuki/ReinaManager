@@ -14,7 +14,7 @@ import { useStore } from '@/store';
 const SortModal: React.FC = () => {
     const { isopen, handleOpen, handleClose } = useModal();
     // 从 store 获取排序状态
-    const { sortOption, sortOrder, setSortOption, setSortOrder } = useStore();
+    const { sortOption, sortOrder } = useStore();
 
     // 本地状态，用于在对话框内部跟踪更改
     const [localSortOption, setLocalSortOption] = useState(sortOption);
@@ -28,12 +28,15 @@ const SortModal: React.FC = () => {
         }
     }, [isopen, sortOption, sortOrder]);
 
+    // 在 SortModal 组件中使用我们优化的排序更新函数
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        // 更新全局状态
-        setSortOption(localSortOption);
-        setSortOrder(localSortOrder);
-        // 重新获取排序后的数据
+
+        // 使用新的updateSort方法一次性更新排序并获取数据
+        const { updateSort } = useStore.getState();
+        await updateSort(localSortOption, localSortOrder);
+
+        // 关闭对话框
         handleClose();
     };
 
@@ -83,7 +86,7 @@ const SortOption = ({ value, onChange }: { value: string, onChange: (value: stri
             <Select value={value} onChange={handleChange}>
                 <MenuItem value="addtime">添加时间(默认)</MenuItem>
                 <MenuItem value="datetime">游戏发布时间</MenuItem>
-                <MenuItem value="rank">BGM评分排名</MenuItem>
+                <MenuItem value="rank">BGM评分综合排名</MenuItem>
             </Select>
         </div>
     );

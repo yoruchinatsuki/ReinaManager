@@ -42,55 +42,59 @@ export function getGames(sortOption = 'addtime', sortOrder: 'asc' | 'desc' = 'as
 
 // 排序游戏数据的辅助函数
 function sortGames(games: GameData[], sortOption: string, sortOrder: 'asc' | 'desc'): GameData[] {
-  // 如果是按添加时间排序，先创建带索引的游戏列表
-  if (sortOption === 'addtime') {
-    // 创建带索引的副本，索引表示添加顺序
-    const indexedGames = games.map((game, index) => ({ 
-      ...game, 
-      _index: index // 添加临时索引，表示在数组中的位置
-    }));
-    
-    // 按索引排序
-    return indexedGames.sort((a, b) => {
-      return sortOrder === 'asc' ? a._index - b._index : b._index - a._index;
-    });
-  }
+  // 克隆游戏数组以避免修改原数组
+  const gamesCopy = [...games];
   
-  // 其他排序逻辑不变
-  return [...games].sort((a, b) => {
-    let valueA = 0;
-    let valueB = 0;
-    
-    // 根据排序选项获取要比较的值
-    switch (sortOption) {
-      case 'datetime':
-        valueA = a.date ? new Date(a.date).getTime() : 0;
-        valueB = b.date ? new Date(b.date).getTime() : 0;
-        break;
-      case 'rank':
-        // 游戏排名比较（排名越小越好，如1比10好）
-        valueA = Number(a.rank) || 99999;
-        valueB = Number(b.rank) || 99999;
-        break;
-      default:
-        // 默认情况不应该到达这里，因为已经在上面处理了addtime
-        valueA = 0;
-        valueB = 0;
+  switch (sortOption) {
+    case 'addtime': {
+      // 创建带索引的副本，索引表示添加顺序
+      const indexedGames = gamesCopy.map((game, index) => ({ 
+        ...game, 
+        _index: index // 添加临时索引，表示在数组中的位置
+      }));
+      
+      // 按索引排序
+      return indexedGames.sort((a, b) => {
+        return sortOrder === 'asc' ? a._index - b._index : b._index - a._index;
+      });
     }
-    
-    // 特殊处理排名排序
-    if (sortOption === 'rank') {
-      // 对于排名:
-      // 升序时: 排名较差的在前面 (较大值在前), 所以是 B-A
-      // 降序时: 排名较好的在前面 (较小值在前), 所以是 A-B
-      return sortOrder === 'asc' ? valueB - valueA : valueA - valueB;
-    }
-    
-    // 对于其他排序选项:
-    // 升序: 小的值在前 (A-B)
-    // 降序: 大的值在前 (B-A)
-    return sortOrder === 'asc' ? valueA - valueB : valueB - valueA;
-  });
+      
+    case 'datetime':
+      return gamesCopy.sort((a, b) => {
+        const valueA = a.date ? new Date(a.date).getTime() : 0;
+        const valueB = b.date ? new Date(b.date).getTime() : 0;
+        return sortOrder === 'asc' ? valueA - valueB : valueB - valueA;
+      });
+      
+    case 'rank':
+      // 综合排序选项 - 与数据库保持一致
+      return gamesCopy.sort((a, b) => {
+        // 首先按评分排序
+        const scoreA = Number(a.score) || 0;
+        const scoreB = Number(b.score) || 0;
+        
+        if (scoreA !== scoreB) {
+          // 评分不同时直接按评分排序
+          return sortOrder === 'asc' ? scoreA - scoreB : scoreB - scoreA;
+        }
+        
+        // 评分相同时，按排名排序
+        let rankA = Number(a.rank) || 0;
+        let rankB = Number(b.rank) || 0;
+        
+        // 将 0 值（无排名）特殊处理
+        if (rankA === 0) rankA = sortOrder === 'asc' ? -1 : 999999;
+        if (rankB === 0) rankB = sortOrder === 'asc' ? -1 : 999999;
+        
+        // 降序时：排名越好（数值越小）越靠前
+        // 升序时：排名越差（数值越大）越靠前
+        return sortOrder === 'asc' ? rankB - rankA : rankA - rankB;
+      });
+      
+    default:
+      // 默认情况下，按添加时间排序
+      return gamesCopy;
+  }
 }
 
 // 保存游戏数据集合到 localStorage

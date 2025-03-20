@@ -51,7 +51,7 @@ const AddModal: React.FC = () => {
                 return null;
             }
             const gameWithPath = { ...res, localpath: path }; // 创建包含原对象所有属性和新 path 属性的新对象
-            console.log(gameWithPath);
+            // console.log(gameWithPath);
             await addGame(gameWithPath);
             setFormText('');
             setPath('');

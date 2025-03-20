@@ -13,7 +13,7 @@
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "ReinaManager",
+        "title": "ReinaManager Ciallo～(∠・ω< )⌒★",
         "width": 1200,
         "height": 700,
         "minWidth": 962,
@@ -30,15 +30,17 @@
     "active": true,
     "targets": "all",
     "icon": [
-      "icons/reina.png",
-      "icons/reina-128.png",
-      "icons/reina.ico"
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
     ],
     "copyright": "© Copyright 2025 huoshen80",
     "windows": {
-        "nsis": {
-          "installerIcon": "icons/reina.ico"
-        }
+      "nsis": {
+        "installerIcon": "icons/icon.ico"
       }
+    }
   }
 }
