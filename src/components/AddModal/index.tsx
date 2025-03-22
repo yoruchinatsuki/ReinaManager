@@ -14,6 +14,8 @@ import { useStore } from '@/store/';
 import { open } from '@tauri-apps/plugin-dialog';
 import CircularProgress from '@mui/material/CircularProgress';
 import { isTauri } from '@tauri-apps/api/core';
+import Switch from '@mui/material/Switch';
+import { time_now } from '@/utils';
 
 const AddModal: React.FC = () => {
     const { bgmToken, addGame, games } = useStore();
@@ -22,6 +24,7 @@ const AddModal: React.FC = () => {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [path, setPath] = useState('');
+    const [customMode, setCustomMode] = useState(false);
 
     // 当路径变化时，更新文本字段
     useEffect(() => {
@@ -33,6 +36,20 @@ const AddModal: React.FC = () => {
 
     const handleSubmit = async () => {
         if (loading) return; // 防止重复提交
+        if (customMode && !path) {
+            setError('未选择可执行程序');
+            setTimeout(() => {
+                setError('');
+            }, 5000);
+            return;
+        }
+        if (customMode) {
+            await addGame({ game_id: String(time_now().getTime()), localpath: path, name: formText, name_cn: '', image: "/images/default.png", time: time_now() });
+            setFormText('');
+            setPath('');
+            handleClose();
+            return;
+        }
         try {
             setLoading(true); // 开始加载
             const res = await fetchFromBgm(formText, bgmToken);
@@ -109,6 +126,14 @@ const AddModal: React.FC = () => {
                         <input className='w-md' type="text" value={path}
                             placeholder="请选择一个可执行程序" readOnly />
                     </p>
+                    <div>
+                        <Switch checked={customMode} onChange={() => {
+                            setCustomMode(!customMode)
+                        }} />
+                        <span>启用自定义模式</span>
+                    </div>
+
+
                     <TextField
                         required
                         margin="dense"

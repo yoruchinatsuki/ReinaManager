@@ -37,7 +37,7 @@ export const routes: RouteGroup[] = [
                 icon: <HomeIcon />,
             },
             {
-                title: '游戏仓库',
+                title: '游戏仓库 ',
                 path: 'libraries',
                 component: Libraries,
                 icon: <GamesIcon />,

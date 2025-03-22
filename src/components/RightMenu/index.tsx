@@ -3,11 +3,11 @@ import ArticleIcon from '@mui/icons-material/Article';
 import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import { useStore } from '@/store';
-import { invoke } from '@tauri-apps/api/core';
-import { path } from '@tauri-apps/api';
+import { handleStartGame, handleOpenFolder } from '@/utils';
+import { AlertDeleteBox } from '@/components/AlertBox';
 
 interface RightMenuProps {
     isopen: boolean;
@@ -17,7 +17,9 @@ interface RightMenuProps {
 }
 
 const RightMenu: React.FC<RightMenuProps> = ({ isopen, anchorPosition, setAnchorEl, id }) => {
-    const { getGameById } = useStore();
+    const { getGameById, deleteGame } = useStore();
+    const [openAlert, setOpenAlert] = useState(false);
+
     useEffect(() => {
         const handleInteraction = () => {
             setAnchorEl(null);
@@ -45,58 +47,13 @@ const RightMenu: React.FC<RightMenuProps> = ({ isopen, anchorPosition, setAnchor
         left: anchorPosition?.left ?? 0,
     };
 
-    const handleDeleteGame = async () => {
+    // 定义删除游戏的处理函数
+    const handleDeleteGame = () => {
         if (id) {
-            await useStore.getState().deleteGame(id);
-        }
-        setAnchorEl(null);
-    }
-
-    const handleStartGame = async () => {
-        if (!id) {
-            console.error('未选择游戏');
-            return;
-        }
-        try {
-
-            const selectedGame = await getGameById(id);
-            if (!selectedGame || !selectedGame.localpath) {
-                console.error('游戏路径未找到');
-                return;
-            }
-            // 调用Rust后端启动游戏
-            await invoke('launch_game', {
-                gamePath: selectedGame.localpath,
-            });
+            deleteGame(id);
             setAnchorEl(null);
-        } catch (error) {
-            console.error('游戏启动失败:', error);
-            // 这里可以添加错误提示UI
         }
-    }
-
-    const handleOpenFolder = async () => {
-        if (!id) {
-            console.error('未选择游戏');
-            return;
-        }
-        try {
-            const selectedGame = await getGameById(id);
-            if (!selectedGame || !selectedGame.localpath) {
-                console.error('游戏路径未找到');
-                return;
-            }
-            const folder = await path.dirname(selectedGame.localpath);
-            if (folder) {
-                // 使用我们自己的后端函数打开文件夹
-                await invoke('open_directory', { dirPath: folder });
-            }
-            setAnchorEl(null);
-
-        } catch (error) {
-            console.error('打开文件夹失败:', error);
-        }
-    }
+    };
 
     return (
         <div
@@ -104,10 +61,15 @@ const RightMenu: React.FC<RightMenuProps> = ({ isopen, anchorPosition, setAnchor
             style={menuStyle}
             onClick={(e) => e.stopPropagation()}
         >
+            <AlertDeleteBox open={openAlert} setOpen={setOpenAlert} onConfirm={handleDeleteGame} />
             <div className="bg-white rounded-lg shadow-lg min-w-[200px] py-1 border border-gray-200">
                 <div
                     className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                    onClick={handleStartGame}>
+                    onClick={() => {
+                        handleStartGame({ id, getGameById });
+                        setAnchorEl(null);
+                    }
+                    }>
                     <PlayCircleOutlineIcon className="mr-2" />
                     <span>启动游戏</span>
                 </div>
@@ -119,7 +81,9 @@ const RightMenu: React.FC<RightMenuProps> = ({ isopen, anchorPosition, setAnchor
                 </Link>
                 <div
                     className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                    onClick={handleDeleteGame}
+                    onClick={() => {
+                        setOpenAlert(true);
+                    }}
                 >
                     <DeleteIcon className="mr-2" />
                     <span>删除游戏</span>
@@ -127,10 +91,14 @@ const RightMenu: React.FC<RightMenuProps> = ({ isopen, anchorPosition, setAnchor
                 <div className="h-[1px] bg-gray-200 my-1" />
                 <div
                     className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
-                    onClick={handleOpenFolder}
+                    onClick={() => {
+                        handleOpenFolder({ id, getGameById });
+                        setAnchorEl(null);
+                    }
+                    }
                 >
                     <FolderOpenIcon className="mr-2" />
-                    <span>打开本地文件夹</span>
+                    <span>打开游戏目录</span>
                 </div>
                 <div
                     className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"

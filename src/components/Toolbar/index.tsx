@@ -1,24 +1,35 @@
 import { useState, useRef } from 'react';
-import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import { ThemeSwitcher } from '@toolpad/core/DashboardLayout';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import GamesIcon from '@mui/icons-material/Games';
+import FolderOpenIcon from '@mui/icons-material/FolderOpen';
+import DeleteIcon from '@mui/icons-material/Delete';
 import AddModal from '@/components/AddModal';
 import SortModal from '@/components/SortModal';
 import FilterModal from '@/components/FilterModal';
-import { Link } from 'react-router';
+import { Link, useLocation, useParams } from 'react-router';
+import { LaunchModal } from '@/components/LaunchModal';
+import Button from '@mui/material/Button';
+import { handleOpenFolder } from '@/utils';
 import { useStore } from '@/store';
-import { invoke } from '@tauri-apps/api/core';
+import type { HanleGamesProps } from '@/types';
+import { AlertDeleteBox } from '@/components/AlertBox';
+
+interface ButtonGroupProps {
+    isLibraries: boolean;
+    isDetail: boolean;
+}
 
 export const useModal = () => {
     const [isopen, setisopen] = useState(false);
     const previousFocus = useRef<HTMLElement | null>(null);
+
     const handleOpen = () => {
         // Store the currently focused element before opening modal
         previousFocus.current = document.activeElement as HTMLElement;
         setisopen(true);
     };
+
     const handleClose = () => {
         setisopen(false);
         // Return focus to the previous element after modal closes
@@ -29,70 +40,99 @@ export const useModal = () => {
     return { isopen, handleOpen, handleClose };
 }
 
-export const Toolbars = () => {
-    return (
-        <Stack direction="row">
-            <Buttongroup />
-            <ThemeSwitcher />
-        </Stack>
-    );
-}
-export const Toolbarsswitch = (path: string) => {
-    return (
-        (path === "/libraries")
-    );
-}
 export const ToLibraries = () => {
     return (
         <>
-            <Link className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer no-underline text-blue visited:text-blue"
-                to={'/libraries'}>
-                <GamesIcon />
-                <span>返回游戏库</span>
-            </Link >
+            <Button
+                component={Link}
+                to="/libraries"
+                startIcon={<GamesIcon />}
+                color="primary"
+                variant="text"
+            >
+                游戏仓库
+            </Button>
             <ThemeSwitcher />
         </>
     );
 }
 
-const Buttongroup = () => {
-    const { selectedGameId, getGameById } = useStore();
-
-    const handleStartGame = async () => {
-        if (!selectedGameId) {
-            console.error('未选择游戏');
-            return;
-        }
-
-        try {
-
-            const selectedGame = await getGameById(selectedGameId);
-            if (!selectedGame || !selectedGame.localpath) {
-                console.error('游戏路径未找到');
-                return;
+const OpenFolder = ({ id, getGameById }: HanleGamesProps) => {
+    return (
+        <Button
+            startIcon={<FolderOpenIcon />}
+            color="primary"
+            variant="text"
+            onClick={() =>
+                handleOpenFolder({ id, getGameById })
             }
+        >
+            打开游戏目录
+        </Button>
+    )
+}
 
-            // 调用Rust后端启动游戏
-            await invoke('launch_game', {
-                gamePath: selectedGame.localpath,
-            });
-        } catch (error) {
-            console.error('游戏启动失败:', error);
-            // 这里可以添加错误提示UI
+export const DeleteModal: React.FC<{ id: string }> = ({ id }) => {
+    const [openAlert, setOpenAlert] = useState(false);
+    const { deleteGame } = useStore();
+
+    const handleDeleteGame = () => {
+        if (id) {
+            deleteGame(id);
+            window.location.href = '/#/libraries';
         }
     }
+    return (
+        <>
+            <Button
+                startIcon={<DeleteIcon />}
+                color="error"
+                variant="text"
+                onClick={() => setOpenAlert(true)}
+            >
+                删除游戏
+            </Button>
+            <AlertDeleteBox open={openAlert} setOpen={setOpenAlert} onConfirm={handleDeleteGame} />
+        </>
+    )
+}
+
+export const Buttongroup = ({ isLibraries, isDetail }: ButtonGroupProps) => {
+    // 使用useParams获取URL参数
+    const { id } = useParams<{ id: string }>();
+    const { getGameById } = useStore();
 
     return (
         <>
-            <Button startIcon={<PlayArrowIcon />}
-                onClick={handleStartGame}
-                disabled={!selectedGameId} // 当没有选择游戏时禁用按钮
-            >
-                启动游戏
-            </Button>
-            <AddModal />
-            <SortModal />
-            <FilterModal />
+            {(isDetail &&
+                id) &&
+                <>
+                    <LaunchModal game_id={id} />
+                    <OpenFolder id={id} getGameById={getGameById} />
+                    <DeleteModal id={id} />
+                </>
+            }
+            {isLibraries &&
+                <>
+                    <LaunchModal />
+                    <AddModal />
+                    <SortModal />
+                    <FilterModal />
+                    <ThemeSwitcher />
+                </>
+            }
         </>
+    );
+}
+
+export const Toolbars = () => {
+    const path = useLocation().pathname;
+    const isLibraries = path === "/libraries";
+    const isDetail = path.startsWith("/libraries/") && path !== "/libraries/";
+    return (
+        <Stack direction="row">
+            <Buttongroup isLibraries={isLibraries} isDetail={isDetail} />
+            {!isLibraries && <ToLibraries />}
+        </Stack>
     );
 }

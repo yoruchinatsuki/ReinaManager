@@ -3,8 +3,8 @@ import { PageContainer } from '@toolpad/core';
 import { useLocation } from 'react-router';
 import type { GameData } from '@/types';
 import { useEffect, useState } from 'react';
-export const Detail: React.FC = () => {
 
+export const Detail: React.FC = () => {
     const { getGameById } = useStore();
     const [game, setGame] = useState<GameData | null>(null);
     const [loading, setLoading] = useState<boolean>(true);

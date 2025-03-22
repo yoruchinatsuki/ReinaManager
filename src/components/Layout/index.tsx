@@ -7,42 +7,52 @@ import {
     DashboardLayout,
     type SidebarFooterProps,
 } from '@toolpad/core/DashboardLayout';
-import { ToLibraries, Toolbars, Toolbarsswitch } from '@/components/Toolbar';
+import { Toolbars } from '@/components/Toolbar';
 import { SearchBox } from '@/components/SearchBox';
 import { PageContainer } from '@toolpad/core';
+import { useMemo } from 'react';
+
+interface CustomAppTitleProps {
+    isLibraries: boolean;
+}
 
 function SidebarFooter({ mini }: SidebarFooterProps) {
     return (
-        <Typography variant="caption" className="m-1 whitespace-nowrap overflow-hidden text-align-center">
+        <Typography variant="caption"
+            className="sticky bottom-0 w-full py-2 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 z-20 text-center block">
             {mini ? `© ${new Date().getFullYear()}` : `© ${new Date().getFullYear()} Made by huoshen80`}
         </Typography>
     );
 }
 
-function CustomAppTitle() {
-    const showTollbar = Toolbarsswitch(useLocation().pathname);
+const CustomAppTitle = ({ isLibraries }: CustomAppTitleProps) => {
     return (
         <Stack direction="row" alignItems="center" spacing={2}>
             <Avatar alt='Reina' src='/images/reina.png' onDragStart={(event) => event.preventDefault()} />
             <Typography variant="h6">ReinaManager</Typography>
             <Chip size="small" label="BETA" color="info" />
-            {showTollbar && <SearchBox />}
+            {isLibraries && <SearchBox />}
         </Stack>
     );
 }
 
 
 export const Layout: React.FC = () => {
-    const showTollbar = Toolbarsswitch(useLocation().pathname);
+    const path = useLocation().pathname;
+    const isLibraries = path === "/libraries";
+    const AppTitle = useMemo(() => {
+        return () => <CustomAppTitle isLibraries={isLibraries} />;
+    }, [isLibraries]);
+
     return (
         <DashboardLayout
             slots={{
-                appTitle: CustomAppTitle,
-                toolbarActions: showTollbar ? Toolbars : ToLibraries,
+                appTitle: AppTitle,
+                toolbarActions: Toolbars,
                 sidebarFooter: SidebarFooter,
-            }} sidebarExpandedWidth={180} defaultSidebarCollapsed={true}
+            }} sidebarExpandedWidth={190} defaultSidebarCollapsed={true}
         >
-            {showTollbar ?
+            {isLibraries ?
                 <PageContainer sx={{ maxWidth: '100% !important' }}>
                     <Outlet />
                 </PageContainer>

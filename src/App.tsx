@@ -27,7 +27,7 @@ const App: React.FC = () => {
     },
     {
       segment: 'libraries',
-      title: '游戏仓库',
+      title: '游戏仓库 ',
       icon: <GamesIcon />,
       children: [
         ...lists,
