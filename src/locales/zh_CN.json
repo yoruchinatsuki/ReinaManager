@@ -1,0 +1,92 @@
+{
+    "app": {
+        "NAVIGATION": {
+            "menu": "菜单",
+            "home": "主页",
+            "gameLibrary": "游戏仓库 ",
+            "settings": "设置"
+        }
+    },
+    "pages": {
+        "Settings": {
+            "language": "语言",
+            "bgmToken": "BGM令牌",
+            "saveBtn": "保存",
+            "getToken": "获取令牌",
+            "tokenPlaceholder": "请填写你的BGM_TOKEN"
+        },
+        "Detail": {
+            "loading": "加载中...",
+            "notFound": "未找到游戏数据",
+            "introduction": "简介",
+            "gameScore": "游戏评分",
+            "releaseDate": "游戏发布时间",
+            "gameRanking": "游戏排行"
+        }
+    },
+    "components": {
+        "SearchBox": {
+            "search": "搜索",
+            "searchGame": "搜索游戏",
+            "inputGameName": "输入游戏名称",
+            "clearSearch": "清除搜索"
+        },
+        "Toolbar": {
+            "gameLibrary": "游戏仓库",
+            "openGameFolder": "打开游戏目录",
+            "deleteGame": "删除游戏"
+        },
+        "LaunchModal": {
+            "launchGame": "启动游戏",
+            "gamePathNotFound": "游戏路径未找到",
+            "launchFailed": "游戏启动失败:"
+        },
+        "SortModal": {
+            "sort": "排序",
+            "sortMethod": "排序方法：",
+            "addTime": "添加时间(默认)",
+            "releaseTime": "游戏发布时间",
+            "bgmRank": "BGM评分综合排名",
+            "ascending": "升序",
+            "descending": "降序",
+            "cancel": "取消",
+            "confirm": "确认"
+        },
+        "RightMenu": {
+            "startGame": "启动游戏",
+            "enterDetails": "进入详情页",
+            "deleteGame": "删除游戏",
+            "openGameFolder": "打开游戏目录",
+            "more": "更多",
+            "desktopOnly": "此功能仅在桌面版可用"
+        },
+        "AlertBox": {
+            "cancel": "取消",
+            "confirmDelete": "确认删除",
+            "deleteGameTitle": "是否删除游戏？",
+            "deleteGameMessage": "此操作无法撤销，确定要删除该游戏吗？"
+        },
+        "AddModal": {
+            "addGame": "添加游戏",
+            "noExecutableSelected": "未选择可执行程序",
+            "gameExists": "游戏已存在",
+            "selectLauncher": "选择启动程序",
+            "selectExecutable": "请选择一个可执行程序",
+            "enableCustomMode": "启用自定义模式",
+            "gameName": "游戏名称",
+            "cancel": "取消",
+            "processing": "处理中...",
+            "confirm": "确认",
+            "executable": "可执行文件"
+        },
+        "FilterModal": {
+            "filter": "筛选",
+            "filterTitle": "筛选游戏",
+            "allGames": "全部游戏",
+            "localGames": "本地游戏",
+            "onlineGames": "网络游戏",
+            "cancel": "取消",
+            "apply": "应用"
+        }
+    }
+}

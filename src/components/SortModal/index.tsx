@@ -10,8 +10,10 @@ import SwapVertIcon from '@mui/icons-material/SwapVert';
 import { useModal } from '@/components/Toolbar';
 import Switch from '@mui/material/Switch';
 import { useStore } from '@/store';
+import { useTranslation } from 'react-i18next';
 
 const SortModal: React.FC = () => {
+    const { t } = useTranslation();
     const { isopen, handleOpen, handleClose } = useModal();
     // 从 store 获取排序状态
     const { sortOption, sortOrder } = useStore();
@@ -42,7 +44,7 @@ const SortModal: React.FC = () => {
 
     return (
         <>
-            <Button onClick={handleOpen} startIcon={<SwapVertIcon />}>排序</Button>
+            <Button onClick={handleOpen} startIcon={<SwapVertIcon />}>{t('components.SortModal.sort')}</Button>
             <Dialog
                 open={isopen}
                 onClose={handleClose}
@@ -56,9 +58,9 @@ const SortModal: React.FC = () => {
                     onSubmit: handleSubmit,
                 }}
             >
-                <DialogTitle>排序</DialogTitle>
+                <DialogTitle>{t('components.SortModal.sort')}</DialogTitle>
                 <DialogContent sx={{ pt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
-                    <div>排序方法：</div>
+                    <div>{t('components.SortModal.sortMethod')}</div>
                     <SortOption
                         value={localSortOption}
                         onChange={setLocalSortOption}
@@ -69,14 +71,15 @@ const SortModal: React.FC = () => {
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose}>取消</Button>
-                    <Button type="submit">确认</Button>
+                    <Button onClick={handleClose}>{t('components.SortModal.cancel')}</Button>
+                    <Button type="submit">{t('components.SortModal.confirm')}</Button>
                 </DialogActions>
             </Dialog>
         </>
     );
 }
 const SortOption = ({ value, onChange }: { value: string, onChange: (value: string) => void }) => {
+    const { t } = useTranslation();
     const handleChange = (event: SelectChangeEvent) => {
         onChange(event.target.value);
     };
@@ -84,14 +87,15 @@ const SortOption = ({ value, onChange }: { value: string, onChange: (value: stri
     return (
         <div>
             <Select value={value} onChange={handleChange}>
-                <MenuItem value="addtime">添加时间(默认)</MenuItem>
-                <MenuItem value="datetime">游戏发布时间</MenuItem>
-                <MenuItem value="rank">BGM评分综合排名</MenuItem>
+                <MenuItem value="addtime">{t('components.SortModal.addTime')}</MenuItem>
+                <MenuItem value="datetime">{t('components.SortModal.releaseTime')}</MenuItem>
+                <MenuItem value="rank">{t('components.SortModal.bgmRank')}</MenuItem>
             </Select>
         </div>
     );
 }
 const UpDownSwitches = ({ value, onChange }: { value: string, onChange: (value: string) => void }) => {
+    const { t } = useTranslation();
     // 使用 asc/desc 而不是布尔值
     const isDesc = value === 'desc';
 
@@ -101,13 +105,13 @@ const UpDownSwitches = ({ value, onChange }: { value: string, onChange: (value: 
 
     return (
         <div style={{ display: 'flex', alignItems: 'center', marginTop: '10px' }}>
-            <span style={{ marginRight: '8px', opacity: isDesc ? 0.5 : 1 }}>升序</span>
+            <span style={{ marginRight: '8px', opacity: isDesc ? 0.5 : 1 }}>{t('components.SortModal.ascending')}</span>
             <Switch
                 checked={isDesc}
                 onChange={handleChange}
                 inputProps={{ 'aria-label': 'controlled' }}
             />
-            <span style={{ marginLeft: '8px', opacity: isDesc ? 1 : 0.5 }}>降序</span>
+            <span style={{ marginLeft: '8px', opacity: isDesc ? 1 : 0.5 }}>{t('components.SortModal.descending')}</span>
         </div>
     );
 }

@@ -4,6 +4,7 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
+import { useTranslation } from 'react-i18next';
 
 interface AlertBoxProps {
     open: boolean;
@@ -20,6 +21,8 @@ export function AlertBox({
     message,
     onConfirm
 }: AlertBoxProps) {
+    const { t } = useTranslation();
+
     const handleClose = () => {
         setOpen(false);
     };
@@ -47,9 +50,9 @@ export function AlertBox({
                 </DialogContent>
             )}
             <DialogActions>
-                <Button onClick={handleClose}>取消</Button>
+                <Button onClick={handleClose}>{t('components.AlertBox.cancel')}</Button>
                 <Button onClick={handleConfirm} color="error" variant="contained" autoFocus>
-                    确认删除
+                    {t('components.AlertBox.confirmDelete')}
                 </Button>
             </DialogActions>
         </Dialog>
@@ -57,12 +60,14 @@ export function AlertBox({
 }
 
 export const AlertDeleteBox: React.FC<AlertBoxProps> = ({ open, setOpen, onConfirm }) => {
+    const { t } = useTranslation();
+
     return (
         <AlertBox
             open={open}
             setOpen={setOpen}
-            title="是否删除游戏？"
-            message="此操作无法撤销，确定要删除该游戏吗？"
+            title={t('components.AlertBox.deleteGameTitle')}
+            message={t('components.AlertBox.deleteGameMessage')}
             onConfirm={onConfirm}
         />
     );

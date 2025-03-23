@@ -1,0 +1,93 @@
+{
+    "app": {
+        "NAVIGATION": {
+            "menu": "Menu",
+            "home": "Home",
+            "gameLibrary": "Game Library ",
+            "settings": "Settings"
+        }
+    },
+    "pages": {
+        "Settings": {
+            "language": "Language",
+            "bgmToken": "BGM Token",
+            "saveBtn": "Save",
+            "getToken": "Get Token",
+            "tokenPlaceholder": "Please enter your BGM_TOKEN"
+        },
+        "Detail": {
+            "loading": "Loading...",
+            "notFound": "Game data not found",
+            "introduction": "Introduction",
+            "gameScore": "Game Score",
+            "releaseDate": "Release Date",
+            "gameRanking": "Game Ranking"
+        }
+    },
+    "components": {
+        "SearchBox": {
+            "search": "Search",
+            "searchGame": "Search games",
+            "inputGameName": "Enter game name",
+            "clearSearch": "Clear search"
+        },
+        "Toolbar": {
+            "gameLibrary": "Game Library",
+            "openGameFolder": "Open Game Folder",
+            "deleteGame": "Delete Game"
+        },
+        "LaunchModal": {
+            "launchGame": "Launch Game",
+            "gamePathNotFound": "Game path not found",
+            "launchFailed": "Failed to launch game:"
+        },
+        "SortModal": {
+            "sort": "Sort",
+            "sortMethod": "Sort Method:",
+            "addTime": "Add Time (Default)",
+            "releaseTime": "Game Release Time",
+            "bgmRank": "BGM Rating Rank",
+            "ascending": "Ascending",
+            "descending": "Descending",
+            "cancel": "Cancel",
+            "confirm": "Confirm"
+        },
+        "RightMenu": {
+            "startGame": "Start Game",
+            "enterDetails": "Game Details",
+            "deleteGame": "Delete Game",
+            "openGameFolder": "Open Game Folder",
+            "more": "More",
+            "desktopOnly": "This feature is only available in desktop version"
+        },
+        "AlertBox": {
+            "cancel": "Cancel",
+            "confirmDelete": "Confirm Delete",
+            "deleteGameTitle": "Delete Game?",
+            "deleteGameMessage": "This action cannot be undone. Are you sure you want to delete this game?"
+        },
+        "AddModal": {
+            "addGame": "Add Game",
+            "noExecutableSelected": "No executable selected",
+            "gameExists": "Game already exists",
+            "selectLauncher": "Select Launcher",
+            "selectExecutable": "Please select an executable file",
+            "enableCustomMode": "Enable Custom Mode",
+            "gameName": "Game Name",
+            "cancel": "Cancel",
+            "processing": "Processing...",
+            "confirm": "Confirm",
+            "executable": "Executable File"
+        },
+        "FilterModal": {
+            "filter": "Filter",
+            "filterTitle": "Filter Games",
+            "allGames": "All Games",
+            "localGames": "Local Games",
+            "onlineGames": "Online Games",
+            "cancel": "Cancel",
+            "apply": "Apply"
+        }
+        
+    }
+}

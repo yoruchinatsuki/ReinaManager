@@ -1,13 +1,15 @@
 import Button from '@mui/material/Button';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import { useStore } from '@/store';
-import { invoke } from '@tauri-apps/api/core';
+import { invoke, isTauri } from '@tauri-apps/api/core';
+import { useTranslation } from 'react-i18next'; // 导入翻译hook
 
 interface LaunchModalProps {
     game_id?: string;
 }
 
 export const LaunchModal = ({ game_id }: LaunchModalProps) => {
+    const { t } = useTranslation(); // 使用翻译函数
     const { selectedGameId, getGameById } = useStore();
 
     const handleStartGame = async (id?: string) => {
@@ -16,10 +18,9 @@ export const LaunchModal = ({ game_id }: LaunchModalProps) => {
         }
 
         try {
-
             const selectedGame = await getGameById(id ? id : selectedGameId);
             if (!selectedGame || !selectedGame.localpath) {
-                console.error('游戏路径未找到');
+                console.error(t('components.LaunchModal.gamePathNotFound'));
                 return;
             }
 
@@ -28,23 +29,24 @@ export const LaunchModal = ({ game_id }: LaunchModalProps) => {
                 gamePath: selectedGame.localpath,
             });
         } catch (error) {
-            console.error('游戏启动失败:', error);
+            console.error(t('components.LaunchModal.launchFailed'), error);
             // 这里可以添加错误提示UI
         }
     }
 
     return (
-        <Button startIcon={<PlayArrowIcon />}
+        <Button
+            startIcon={<PlayArrowIcon />}
             onClick={() => {
-                console.log(game_id)
+                console.log(game_id);
                 if (game_id)
-                    handleStartGame(game_id)
+                    handleStartGame(game_id);
                 else
-                    handleStartGame()
+                    handleStartGame();
             }}
-            disabled={!selectedGameId} // 当没有选择游戏时禁用按钮
+            disabled={!selectedGameId || !isTauri()} // 当没有选择游戏时禁用按钮
         >
-            启动游戏
+            {t('components.LaunchModal.launchGame')}
         </Button>
     );
 }

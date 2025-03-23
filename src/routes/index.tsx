@@ -28,27 +28,27 @@ export interface RouteGroup {
 // 统一的路由配置
 export const routes: RouteGroup[] = [
     {
-        groupTitle: '菜单',
+        groupTitle: 'menu',
         items: [
             {
-                title: '主页',
+                title: 'home',
                 path: '',
                 component: Home,
                 icon: <HomeIcon />,
             },
             {
-                title: '游戏仓库 ',
+                title: 'game library ',
                 path: 'libraries',
                 component: Libraries,
                 icon: <GamesIcon />,
                 children: [
                     // 默认子路由使用 index
-                    { title: '默认', index: true, component: Card },
-                    { title: 'demo1', path: ':id', component: Detail },
+                    { title: 'default', index: true, component: Card },
+                    { title: 'detail', path: ':id', component: Detail },
                 ]
             },
             {
-                title: '设置',
+                title: 'settings',
                 path: 'settings',
                 component: Settings,
                 icon: <SettingsIcon />,

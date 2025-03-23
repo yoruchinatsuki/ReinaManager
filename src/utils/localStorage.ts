@@ -170,35 +170,47 @@ export function setSetting<K extends keyof Settings>(key: K, value: Settings[K])
 
 // 纯前端搜索游戏，根据name_cn(为空则搜索name)进行模糊匹配
 export function searchGamesLocal(
-  keyword: string,
-  sortOption = 'addtime',
+  keyword: string, 
+  type: 'all' | 'local' | 'online' = 'all',
+  sortOption = 'addtime', 
   sortOrder: 'asc' | 'desc' = 'asc'
 ): GameData[] {
-  // 如果关键字为空，返回所有游戏
+  // 浏览器不支持本地游戏，如果筛选类型是local，直接返回空数组
+  if (type === 'local') {
+    return [];
+  }
+  
+  // 如果没有关键字但类型是online或all，直接返回所有游戏
   if (!keyword || keyword.trim() === '') {
     return getGames(sortOption, sortOrder);
   }
+  
+  // 否则执行关键字搜索
+  const searchRegex = new RegExp(keyword.trim(), 'i');
+  const games = getGames(sortOption, sortOrder);
+  
+  return games.filter(game => 
+    (game.name_cn && searchRegex.test(game.name_cn)) || 
+    searchRegex.test(game.name)
+  );
+}
 
-  // 从localStorage获取所有游戏数据
-  const allGames = getGames();
+export function filterGamesByTypeLocal(
+  type: 'all' | 'local' | 'online',
+  sortOption = 'addtime',
+  sortOrder: 'asc' | 'desc' = 'asc'
+): GameData[] {
+  // 浏览器环境下简化处理:
+  // - 'all': 返回所有游戏
+  // - 'local': 在浏览器中无本地游戏，返回空数组
+  // - 'online': 浏览器中所有游戏都是在线的，返回所有游戏
   
-  // 转换关键字为小写以进行不区分大小写的搜索
-  const searchKeyword = keyword.toLowerCase().trim();
+  const games = getGames(sortOption, sortOrder);
   
-  // 过滤游戏：优先匹配name_cn，如果name_cn为空或未找到匹配，则匹配name
-  const filteredGames = allGames.filter(game => {
-    const nameCn = (game.name_cn || '').toLowerCase();
-    const name = (game.name || '').toLowerCase();
-    
-    // 如果中文名存在并匹配，返回true
-    if (nameCn?.includes(searchKeyword)) {
-      return true;
-    }
-    
-    // 如果中文名为空或不匹配，检查英文名
-    return name.includes(searchKeyword);
-  });
-  
-  // 使用现有的排序函数对结果进行排序
-  return sortGames(filteredGames, sortOption, sortOrder);
+  if (type === 'all' || type === 'online') {
+    return games;
+  } else {
+    // 浏览器环境中没有本地游戏
+    return [];
+  }
 }

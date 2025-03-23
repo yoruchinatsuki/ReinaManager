@@ -1,0 +1,92 @@
+{
+    "app": {
+        "NAVIGATION": {
+            "menu": "選單",
+            "home": "首頁",
+            "gameLibrary": "遊戲倉庫 ",
+            "settings": "設定"
+        }
+    },
+    "pages": {
+        "Settings": {
+            "language": "語言",
+            "bgmToken": "BGM令牌",
+            "saveBtn": "儲存",
+            "getToken": "獲取令牌",
+            "tokenPlaceholder": "請填寫你的BGM_TOKEN"
+        },
+        "Detail": {
+            "loading": "載入中...",
+            "notFound": "未找到遊戲資料",
+            "introduction": "簡介",
+            "gameScore": "遊戲評分",
+            "releaseDate": "遊戲發布時間",
+            "gameRanking": "遊戲排行"
+        }
+    },
+    "components": {
+        "SearchBox": {
+            "search": "搜尋",
+            "searchGame": "搜尋遊戲",
+            "inputGameName": "輸入遊戲名稱",
+            "clearSearch": "清除搜尋"
+        },
+        "Toolbar": {
+            "gameLibrary": "遊戲倉庫",
+            "openGameFolder": "開啟遊戲目錄",
+            "deleteGame": "刪除遊戲"
+        },
+        "LaunchModal": {
+            "launchGame": "啟動遊戲",
+            "gamePathNotFound": "遊戲路徑未找到",
+            "launchFailed": "遊戲啟動失敗:"
+        },
+        "SortModal": {
+            "sort": "排序",
+            "sortMethod": "排序方法：",
+            "addTime": "添加時間(默認)",
+            "releaseTime": "遊戲發布時間",
+            "bgmRank": "BGM評分綜合排名",
+            "ascending": "升序",
+            "descending": "降序",
+            "cancel": "取消",
+            "confirm": "確認"
+        },
+        "RightMenu": {
+            "startGame": "啟動遊戲",
+            "enterDetails": "進入詳情頁",
+            "deleteGame": "刪除遊戲",
+            "openGameFolder": "開啟遊戲目錄",
+            "more": "更多",
+            "desktopOnly": "此功能僅在桌面版可用"
+        },
+        "AlertBox": {
+            "cancel": "取消",
+            "confirmDelete": "確認刪除",
+            "deleteGameTitle": "是否刪除遊戲？",
+            "deleteGameMessage": "此操作無法撤銷，確定要刪除該遊戲嗎？"
+        },
+        "AddModal": {
+            "addGame": "添加遊戲",
+            "noExecutableSelected": "未選擇可執行程序",
+            "gameExists": "遊戲已存在",
+            "selectLauncher": "選擇啟動程序",
+            "selectExecutable": "請選擇一個可執行程序",
+            "enableCustomMode": "啟用自定義模式",
+            "gameName": "遊戲名稱",
+            "cancel": "取消",
+            "processing": "處理中...",
+            "confirm": "確認",
+            "executable": "可執行文件"
+        },
+        "FilterModal": {
+            "filter": "篩選",
+            "filterTitle": "篩選遊戲",
+            "allGames": "全部遊戲",
+            "localGames": "本地遊戲",
+            "onlineGames": "網路遊戲",
+            "cancel": "取消",
+            "apply": "應用"
+        }
+    }
+}

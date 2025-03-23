@@ -9,7 +9,7 @@
 
 ![Status](https://img.shields.io/badge/status-active-brightgreen) ![Stage](https://img.shields.io/badge/stage-beta-blue)
 
-<p align="center">English|<a href="./README.zh_CN.md">中文</a></p>
+<p align="center">English|<a href="./README.zh_CN.md">中文</a>|<a href="./README.zh_TW.md">繁體中文</a>|<a href="./README.ja_JP.md">日本語</a></p>
 
 <h5>A lightweight visual novel management ,Under development...</h5>
 
@@ -39,7 +39,7 @@ The `Reina` in the name is the character <a href="https://vndb.org/c64303"><b>�
 - [x] Open the local game folder
 - [ ] Home page functions
 - [ ] Add VNDB api to search games
-- [ ] Internationalized language support
+- [x] I18n support
 - [ ] Custom data of games
 - [ ] Count the time spent playing
 - [ ] Beautify individual pages

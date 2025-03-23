@@ -6,6 +6,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
 import { useStore } from '@/store';
+import { useTranslation } from 'react-i18next';
 
 // 防抖函数
 function useDebounce<T>(value: T, delay: number): T {
@@ -25,6 +26,7 @@ function useDebounce<T>(value: T, delay: number): T {
 }
 
 export const SearchBox = () => {
+    const { t } = useTranslation();
     const { searchKeyword, searchGames } = useStore();
     const [keyword, setKeyword] = useState(searchKeyword);
 
@@ -61,11 +63,11 @@ export const SearchBox = () => {
 
     return (
         <>
-            <Tooltip title="搜索" enterDelay={1000}>
+            <Tooltip title={t('components.SearchBox.search')} enterDelay={1000}>
                 <div>
                     <IconButton
                         type="button"
-                        aria-label="search"
+                        aria-label={t('components.SearchBox.search')}
                         sx={{
                             display: { xs: 'inline', md: 'none' },
                         }}
@@ -76,13 +78,13 @@ export const SearchBox = () => {
                 </div>
             </Tooltip>
             <TextField
-                label="搜索"
+                label={t('components.SearchBox.search')}
                 variant="outlined"
                 size="small"
                 value={keyword}
                 onChange={handleInputChange}
-                aria-label="搜索游戏"
-                placeholder="输入游戏名称"
+                aria-label={t('components.SearchBox.searchGame')}
+                placeholder={t('components.SearchBox.inputGameName')}
                 InputProps={{
                     endAdornment: (
                         <InputAdornment position="end">
@@ -91,7 +93,7 @@ export const SearchBox = () => {
                                     onClick={handleClear}
                                     edge="end"
                                     size="small"
-                                    aria-label="清除搜索"
+                                    aria-label={t('components.SearchBox.clearSearch')}
                                 >
                                     <ClearIcon fontSize="small" />
                                 </IconButton>

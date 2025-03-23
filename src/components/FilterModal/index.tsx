@@ -1,59 +1,79 @@
+import { useState } from 'react';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
-import MenuItem from '@mui/material/MenuItem';
-import Select from '@mui/material/Select';
-import FilterAltIcon from '@mui/icons-material/FilterAlt';
-import { useModal } from '@/components/Toolbar';
+import FormControl from '@mui/material/FormControl';
+import RadioGroup from '@mui/material/RadioGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Radio from '@mui/material/Radio';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import { useStore } from '@/store';
+import { useTranslation } from 'react-i18next';
 
-const FilterModal: React.FC = () => {
-    const { isopen, handleOpen, handleClose } = useModal();
+export type GameFilterType = 'all' | 'local' | 'online';
+
+export const FilterModal: React.FC = () => {
+    const { t } = useTranslation();
+    const { gameFilterType, setGameFilterType } = useStore();
+
+    const [open, setOpen] = useState(false);
+    const [filterValue, setFilterValue] = useState<GameFilterType>(gameFilterType || 'all');
+
+    const handleOpen = () => setOpen(true);
+    const handleClose = () => setOpen(false);
+
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setFilterValue(event.target.value as GameFilterType);
+    };
+
+    const handleApply = () => {
+        setGameFilterType(filterValue);
+        handleClose();
+    };
+
     return (
         <>
-            <Button onClick={handleOpen} startIcon={<FilterAltIcon />}>筛选</Button>
-            <Dialog
-                open={isopen}
-                onClose={handleClose}
-                closeAfterTransition={false}
-                TransitionProps={{
-                    timeout: 0, // 禁用过渡动画
-                }}
-                aria-labelledby="filter-dialog-title"
-                PaperProps={{
-                    component: 'form',
-                    onSubmit: (event: React.FormEvent<HTMLFormElement>) => {
-                        event.preventDefault();
-                        const formData = new FormData(event.currentTarget);
-                        const formJson = Object.fromEntries((formData).entries());
-                        const email = formJson.email;
-                        console.log(email);
-                        handleClose();
-                    },
-                }}
+            <Button
+                startIcon={<FilterListIcon />}
+                onClick={handleOpen}
             >
-                <DialogTitle>筛选</DialogTitle>
+                {t('components.FilterModal.filter')}
+            </Button>
+
+            <Dialog open={open} onClose={handleClose}>
+                <DialogTitle>{t('components.FilterModal.filterTitle')}</DialogTitle>
                 <DialogContent>
-                    <FilterOption />
+                    <FormControl component="fieldset">
+                        <RadioGroup value={filterValue} onChange={handleChange}>
+                            <FormControlLabel
+                                value="all"
+                                control={<Radio />}
+                                label={t('components.FilterModal.allGames')}
+                            />
+                            <FormControlLabel
+                                value="local"
+                                control={<Radio />}
+                                label={t('components.FilterModal.localGames')}
+                            />
+                            <FormControlLabel
+                                value="online"
+                                control={<Radio />}
+                                label={t('components.FilterModal.onlineGames')}
+                            />
+                        </RadioGroup>
+                    </FormControl>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose}>取消</Button>
-                    <Button type="submit">确认</Button>
+                    <Button onClick={handleClose}>
+                        {t('components.FilterModal.cancel')}
+                    </Button>
+                    <Button onClick={handleApply} color="primary">
+                        {t('components.FilterModal.apply')}
+                    </Button>
                 </DialogActions>
             </Dialog>
         </>
     );
 }
-const FilterOption = () => {
-    return (
-        <div>
-            <Select defaultValue={10}>
-                <MenuItem value={10}>Ten</MenuItem>
-                <MenuItem value={20}>Twenty</MenuItem>
-                <MenuItem value={30}>aaaa</MenuItem>
-            </Select>
-        </div>
-    );
-}
-export default FilterModal;

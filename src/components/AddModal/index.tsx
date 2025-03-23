@@ -16,8 +16,10 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { isTauri } from '@tauri-apps/api/core';
 import Switch from '@mui/material/Switch';
 import { time_now } from '@/utils';
+import { useTranslation } from 'react-i18next';
 
 const AddModal: React.FC = () => {
+    const { t } = useTranslation();
     const { bgmToken, addGame, games } = useStore();
     const { isopen, handleOpen, handleClose } = useModal();
     const [formText, setFormText] = useState('');
@@ -37,7 +39,7 @@ const AddModal: React.FC = () => {
     const handleSubmit = async () => {
         if (loading) return; // 防止重复提交
         if (customMode && !path) {
-            setError('未选择可执行程序');
+            setError(t('components.AddModal.noExecutableSelected'));
             setTimeout(() => {
                 setError('');
             }, 5000);
@@ -61,7 +63,7 @@ const AddModal: React.FC = () => {
                 return null;
             }
             if (games.find((game) => game.game_id === res.game_id)) {
-                setError('游戏已存在');
+                setError(t('components.AddModal.gameExists'));
                 setTimeout(() => {
                     setError('');
                 }, 5000);
@@ -84,7 +86,7 @@ const AddModal: React.FC = () => {
             multiple: false,
             directory: false,
             filters: [{
-                name: "可执行文件",
+                name: t('components.AddModal.executable'),
                 extensions: ["exe"]
             }]
         });
@@ -101,7 +103,7 @@ const AddModal: React.FC = () => {
 
     return (
         <>
-            <Button onClick={handleOpen} startIcon={<AddIcon />}>添加游戏</Button>
+            <Button onClick={handleOpen} startIcon={<AddIcon />}>{t('components.AddModal.addGame')}</Button>
             <Dialog
                 open={isopen}
                 onClose={(_, reason) => {
@@ -113,7 +115,7 @@ const AddModal: React.FC = () => {
                 aria-labelledby="addgame-dialog-title"
             >
                 {error && <Alert severity="error">{error}</Alert>}
-                <DialogTitle>添加游戏</DialogTitle>
+                <DialogTitle>{t('components.AddModal.addGame')}</DialogTitle>
                 <DialogContent>
                     <Button className='w-md' variant='contained' onClick={async () => {
                         const result = await handleDirectory();
@@ -121,16 +123,16 @@ const AddModal: React.FC = () => {
                             setPath(
                                 result
                             );
-                    }} startIcon={<FileOpenIcon />} disabled={!isTauri()} >选择启动程序</Button>
+                    }} startIcon={<FileOpenIcon />} disabled={!isTauri()} >{t('components.AddModal.selectLauncher')}</Button>
                     <p>
                         <input className='w-md' type="text" value={path}
-                            placeholder="请选择一个可执行程序" readOnly />
+                            placeholder={t('components.AddModal.selectExecutable')} readOnly />
                     </p>
                     <div>
                         <Switch checked={customMode} onChange={() => {
                             setCustomMode(!customMode)
                         }} />
-                        <span>启用自定义模式</span>
+                        <span>{t('components.AddModal.enableCustomMode')}</span>
                     </div>
 
 
@@ -139,7 +141,7 @@ const AddModal: React.FC = () => {
                         margin="dense"
                         id="name"
                         name="game-name"
-                        label="游戏名称"
+                        label={t('components.AddModal.gameName')}
                         type="text"
                         fullWidth
                         variant="standard"
@@ -155,14 +157,14 @@ const AddModal: React.FC = () => {
                         handleClose();
                     }
 
-                    } disabled={loading} >取消</Button>
+                    } disabled={loading} >{t('components.AddModal.cancel')}</Button>
                     <Button
                         variant="contained"
                         onClick={handleSubmit}
                         disabled={formText === '' || loading}
                         startIcon={loading ? <CircularProgress size={20} /> : null}
                     >
-                        {loading ? '处理中...' : '确认'}
+                        {loading ? t('components.AddModal.processing') : t('components.AddModal.confirm')}
                     </Button>
                 </DialogActions>
             </Dialog>

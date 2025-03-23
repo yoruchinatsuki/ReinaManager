@@ -6,7 +6,8 @@ import {
   insertGame as insertGameRepository,
   getGameByGameId as getGameByIdRepository,
   deleteGame as deleteGameRepository,
-searchGames as searchGamesRepository 
+searchGames as searchGamesRepository ,
+filterGamesByType as filterGamesByTypeRepository 
 } from '@/utils/repository';
 import { 
   getGames as getGamesLocal, 
@@ -15,7 +16,8 @@ import {
   getBgmTokenLocal, 
   setBgmTokenLocal,
   getGameByIdLocal,
-  searchGamesLocal
+  searchGamesLocal,
+   filterGamesByTypeLocal
 } from '@/utils/localStorage';
 import { getBgmTokenRepository, setBgmTokenRepository } from '@/utils/settingsConfig';
 import { isTauri } from '@tauri-apps/api/core';
@@ -62,6 +64,8 @@ interface AppState {
   // 添加通用刷新方法
   refreshGameData: (customSortOption?: string, customSortOrder?: 'asc' | 'desc') => Promise<void>;
 
+  gameFilterType: 'all' | 'local' | 'online';
+  setGameFilterType: (type: 'all' | 'local' | 'online') => void;
 }
 
 // 创建持久化的全局状态
@@ -84,24 +88,33 @@ export const useStore = create<AppState>()(
 
       searchKeyword: '',
 
+      gameFilterType: 'all',
+
       // 优化刷新数据的方法，减少状态更新
 refreshGameData: async (customSortOption?: string, customSortOrder?: 'asc' | 'desc') => {
   set({ loading: true });
   
   try {
-    const { searchKeyword } = get();
+    const { searchKeyword, gameFilterType } = get(); // 获取当前筛选类型
     const option = customSortOption || get().sortOption;
     const order = customSortOrder || get().sortOrder;
     
     let data: GameData[];
     if (searchKeyword && searchKeyword.trim() !== '') {
       data = isTauri()
-        ? await searchGamesRepository(searchKeyword, option, order)
-        : searchGamesLocal(searchKeyword, option, order);
+        ? await searchGamesRepository(searchKeyword, gameFilterType, option, order) // 使用gameFilterType
+        : searchGamesLocal(searchKeyword, gameFilterType, option, order); // 使用gameFilterType
     } else {
-      data = isTauri()
-        ? await getGamesRepository(option, order)
-        : getGamesLocal(option, order);
+      // 当没有搜索词时，根据筛选类型决定使用哪个函数
+      if (gameFilterType !== 'all') {
+        data = isTauri()
+          ? await filterGamesByTypeRepository(gameFilterType, option, order)
+          : filterGamesByTypeLocal(gameFilterType, option, order);
+      } else {
+        data = isTauri()
+          ? await getGamesRepository(option, order)
+          : getGamesLocal(option, order);
+      }
     }
     
     // 一次性设置数据和状态
@@ -180,24 +193,26 @@ refreshGameData: async (customSortOption?: string, customSortOrder?: 'asc' | 'de
         set({ searchKeyword: keyword });
       },
       
-      // 搜索方法逻辑完善
-searchGames: async (keyword: string) => {
+      // 修改 searchGames 函数定义，添加 filterType 参数
+searchGames: async (keyword: string, filterType?: 'all' | 'local' | 'online') => {
   set({ loading: true, searchKeyword: keyword });
+  const type = filterType || get().gameFilterType;
+  
+  // 浏览器环境下的特殊处理
+  if (!isTauri() && type === 'local') {
+    set({ games: [], loading: false });
+    return;
+  }
+  
   try {
     const option = get().sortOption;
     const order = get().sortOrder;
     
     let data: GameData[];
-    if (!keyword || keyword.trim() === '') {
-      // 如果搜索关键字为空，获取所有游戏
-      data = isTauri()
-        ? await getGamesRepository(option, order)
-        : getGamesLocal(option, order);
+    if (isTauri()) {
+      data = await searchGamesRepository(keyword, type, option, order);
     } else {
-      // 正常搜索
-      data = isTauri()
-        ? await searchGamesRepository(keyword, option, order)
-        : searchGamesLocal(keyword, option, order);
+      data = searchGamesLocal(keyword, type, option, order);
     }
     
     set({ games: data });
@@ -214,18 +229,25 @@ updateSort: async (option: string, order: 'asc' | 'desc') => {
   set({ loading: true }); // 立即进入加载状态，防止闪烁
   
   try {
-    const { searchKeyword } = get();
+    const { searchKeyword, gameFilterType } = get(); // 获取当前筛选类型
     let data: GameData[];
     
     // 直接获取新排序的数据
     if (searchKeyword && searchKeyword.trim() !== '') {
       data = isTauri()
-        ? await searchGamesRepository(searchKeyword, option, order)
-        : searchGamesLocal(searchKeyword, option, order);
+        ? await searchGamesRepository(searchKeyword, gameFilterType, option, order) // 使用gameFilterType
+        : searchGamesLocal(searchKeyword, gameFilterType, option, order); // 使用gameFilterType
     } else {
-      data = isTauri()
-        ? await getGamesRepository(option, order)
-        : getGamesLocal(option, order);
+      // 当没有搜索词时，使用筛选类型
+      if (gameFilterType !== 'all') {
+        data = isTauri()
+          ? await filterGamesByTypeRepository(gameFilterType, option, order)
+          : filterGamesByTypeLocal(gameFilterType, option, order);
+      } else {
+        data = isTauri()
+          ? await getGamesRepository(option, order)
+          : getGamesLocal(option, order);
+      }
     }
     
     // 一次性更新所有状态
@@ -287,6 +309,51 @@ setSortOrder: (order: 'asc' | 'desc') => {
       setSelectedGameId: (id: string | null) => {
         set({ selectedGameId: id });
       },
+
+      // 修改 setGameFilterType 函数，避免循环引用
+setGameFilterType: (type: 'all' | 'local' | 'online') => {
+  const prevType = get().gameFilterType;
+  
+  // 如果类型没变，不做任何操作
+  if (prevType === type) return;
+  
+  // 设置新的筛选类型
+  set({ gameFilterType: type, loading: true });
+  
+  // 获取当前的搜索关键字
+  const { searchKeyword, sortOption, sortOrder } = get();
+  
+  // 使用修改后的 searchGames 函数，但避免触发额外的状态更新
+  try {
+    // 这里直接调用底层的数据获取函数，而不是 searchGames
+    const fetchData = async () => {
+      let data: GameData[];
+      
+      if (!searchKeyword || searchKeyword.trim() === '') {
+        if (type !== 'all') {
+          data = isTauri()
+            ? await filterGamesByTypeRepository(type, sortOption, sortOrder)
+            : filterGamesByTypeLocal(type, sortOption, sortOrder);
+        } else {
+          data = isTauri()
+            ? await getGamesRepository(sortOption, sortOrder)
+            : getGamesLocal(sortOption, sortOrder);
+        }
+      } else {
+        data = isTauri()
+          ? await searchGamesRepository(searchKeyword, type, sortOption, sortOrder)
+          : searchGamesLocal(searchKeyword, type, sortOption, sortOrder);
+      }
+      
+      set({ games: data, loading: false });
+    };
+    
+    fetchData();
+  } catch (error) {
+    console.error('应用筛选失败:', error);
+    set({ loading: false });
+  }
+},
       
       // 初始化方法，先初始化数据库，然后加载所有需要的数据
       initialize: async () => {        

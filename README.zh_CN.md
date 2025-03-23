@@ -9,7 +9,7 @@
 
 ![Status](https://img.shields.io/badge/status-active-brightgreen) ![Stage](https://img.shields.io/badge/stage-beta-blue)
 
-<p align="center"><a href="./README.md">English</a>|中文</p>
+<p align="center"><a href="./README.md">English</a>|中文|<a href="./README.zh_TW.md">繁體中文</a>|<a href="./README.ja_JP.md">日本語</a></p>
 
 <h5>一个轻量级的视觉小说管理工具，正在开发中...</h5>
 
@@ -33,7 +33,7 @@
 - [x] 打开本地游戏文件夹
 - [ ] 主页功能
 - [ ] 添加VNDB API用于搜索游戏
-- [ ] 国际化语言支持
+- [x] 国际化语言支持
 - [ ] 游戏的自定义数据
 - [ ] 统计游戏时间
 - [ ] 美化各个页面

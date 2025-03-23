@@ -2,6 +2,8 @@ import { open } from '@tauri-apps/plugin-shell';
 import { invoke, isTauri } from '@tauri-apps/api/core';
 import {path} from '@tauri-apps/api';
 import type { HanleGamesProps } from '@/types';
+import { createTheme } from '@mui/material/styles';
+
 
 export const time_now=()=>{
     // 获取当前时间
@@ -30,6 +32,18 @@ return currentDate;
 // console.log(`当前时间：${year}-${month}-${date}${hours}:${minutes}:${seconds}`);
 
 }
+
+export const Buttontheme = createTheme({
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          textTransform: 'none', // 禁用所有按钮的文本大写转换
+        },
+      },
+    },
+  },
+});
 
 export async function openurl(url: string) {
   if (isTauri()) {
@@ -80,3 +94,4 @@ export const handleStartGame = async ({id,getGameById}:HanleGamesProps) => {
             console.error('打开文件夹失败:', error);
         }
     }
+

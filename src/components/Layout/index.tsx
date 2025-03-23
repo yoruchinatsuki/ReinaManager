@@ -19,7 +19,7 @@ interface CustomAppTitleProps {
 function SidebarFooter({ mini }: SidebarFooterProps) {
     return (
         <Typography variant="caption"
-            className="sticky bottom-0 w-full py-2 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 z-20 text-center block">
+            className="absolute bottom-0 left-0 right-0 w-full text-center border-t border-gray-200 dark:border-gray-700  dark:bg-gray-800 whitespace-nowrap overflow-hidden select-none">
             {mini ? `© ${new Date().getFullYear()}` : `© ${new Date().getFullYear()} Made by huoshen80`}
         </Typography>
     );
@@ -27,7 +27,7 @@ function SidebarFooter({ mini }: SidebarFooterProps) {
 
 const CustomAppTitle = ({ isLibraries }: CustomAppTitleProps) => {
     return (
-        <Stack direction="row" alignItems="center" spacing={2}>
+        <Stack direction="row" alignItems="center" spacing={2} className='select-none'>
             <Avatar alt='Reina' src='/images/reina.png' onDragStart={(event) => event.preventDefault()} />
             <Typography variant="h6">ReinaManager</Typography>
             <Chip size="small" label="BETA" color="info" />
@@ -50,19 +50,13 @@ export const Layout: React.FC = () => {
                 appTitle: AppTitle,
                 toolbarActions: Toolbars,
                 sidebarFooter: SidebarFooter,
-            }} sidebarExpandedWidth={190} defaultSidebarCollapsed={true}
+            }} sidebarExpandedWidth={220} defaultSidebarCollapsed={true}
         >
             {isLibraries ?
                 <PageContainer sx={{ maxWidth: '100% !important' }}>
                     <Outlet />
                 </PageContainer>
                 : <Outlet />}
-            {/* <Outlet /> */}
-            {/* <Typography variant="h5" sx={{
-                marginLeft: '3%',
-                marginTop: '1%',
-                userSelect: 'none'
-            }}>{location.title}</Typography> */}
         </DashboardLayout>
     );
 }

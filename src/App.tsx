@@ -1,14 +1,18 @@
 import './App.css'
+import '@/utils/i18n';
 import { Outlet } from "react-router";
-// import { NAVIGATION } from '@/routes'
 import type { Navigation } from '@toolpad/core';
 import { ReactRouterAppProvider } from '@toolpad/core/react-router'
 import HomeIcon from '@mui/icons-material/Home';
 import GamesIcon from '@mui/icons-material/Games';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { useStore } from './store';
+import { useTranslation } from 'react-i18next';
+import { ThemeProvider } from '@mui/material/styles';
+import { Buttontheme } from '@/utils';
 
 const App: React.FC = () => {
+  const { t } = useTranslation();
   const { games } = useStore();
   const lists = games.map((game) => {
     return {
@@ -19,15 +23,15 @@ const App: React.FC = () => {
   const NAVIGATION: Navigation = [
     {
       kind: 'header',
-      title: '菜单',
+      title: t('app.NAVIGATION.menu'),
     },
     {
-      title: '主页',
+      title: t('app.NAVIGATION.home'),
       icon: <HomeIcon />,
     },
     {
       segment: 'libraries',
-      title: '游戏仓库 ',
+      title: t('app.NAVIGATION.gameLibrary'),
       icon: <GamesIcon />,
       children: [
         ...lists,
@@ -35,7 +39,7 @@ const App: React.FC = () => {
     },
     {
       segment: 'settings',
-      title: '设置',
+      title: t('app.NAVIGATION.settings'),
       icon: <SettingsIcon />,
     }
   ];
@@ -43,7 +47,9 @@ const App: React.FC = () => {
 
   return (
     <ReactRouterAppProvider navigation={NAVIGATION}>
-      <Outlet />
+      <ThemeProvider theme={Buttontheme}>
+        <Outlet />
+      </ThemeProvider>
     </ReactRouterAppProvider>
   )
 

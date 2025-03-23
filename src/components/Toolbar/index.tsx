@@ -6,7 +6,7 @@ import FolderOpenIcon from '@mui/icons-material/FolderOpen';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddModal from '@/components/AddModal';
 import SortModal from '@/components/SortModal';
-import FilterModal from '@/components/FilterModal';
+import { FilterModal } from '@/components/FilterModal';
 import { Link, useLocation, useParams } from 'react-router';
 import { LaunchModal } from '@/components/LaunchModal';
 import Button from '@mui/material/Button';
@@ -14,6 +14,8 @@ import { handleOpenFolder } from '@/utils';
 import { useStore } from '@/store';
 import type { HanleGamesProps } from '@/types';
 import { AlertDeleteBox } from '@/components/AlertBox';
+import { useTranslation } from 'react-i18next';
+import { isTauri } from '@tauri-apps/api/core';
 
 interface ButtonGroupProps {
     isLibraries: boolean;
@@ -41,6 +43,7 @@ export const useModal = () => {
 }
 
 export const ToLibraries = () => {
+    const { t } = useTranslation();
     return (
         <>
             <Button
@@ -50,7 +53,7 @@ export const ToLibraries = () => {
                 color="primary"
                 variant="text"
             >
-                游戏仓库
+                {t('components.Toolbar.gameLibrary')}
             </Button>
             <ThemeSwitcher />
         </>
@@ -58,21 +61,24 @@ export const ToLibraries = () => {
 }
 
 const OpenFolder = ({ id, getGameById }: HanleGamesProps) => {
+    const { t } = useTranslation();
     return (
         <Button
             startIcon={<FolderOpenIcon />}
             color="primary"
             variant="text"
+            disabled={!isTauri()}
             onClick={() =>
                 handleOpenFolder({ id, getGameById })
             }
         >
-            打开游戏目录
+            {t('components.Toolbar.openGameFolder')}
         </Button>
     )
 }
 
 export const DeleteModal: React.FC<{ id: string }> = ({ id }) => {
+    const { t } = useTranslation();
     const [openAlert, setOpenAlert] = useState(false);
     const { deleteGame } = useStore();
 
@@ -90,7 +96,7 @@ export const DeleteModal: React.FC<{ id: string }> = ({ id }) => {
                 variant="text"
                 onClick={() => setOpenAlert(true)}
             >
-                删除游戏
+                {t('components.Toolbar.deleteGame')}
             </Button>
             <AlertDeleteBox open={openAlert} setOpen={setOpenAlert} onConfirm={handleDeleteGame} />
         </>

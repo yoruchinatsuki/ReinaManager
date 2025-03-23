@@ -118,19 +118,33 @@ export async function deleteGame(gameId: string) {
   await db.execute("DELETE FROM games WHERE game_id = ?;", [gameId]);
 }
 
-// 搜索游戏数据，根据name_cn或name进行搜索
+// 更新搜索游戏函数，添加类型筛选功能
 export async function searchGames(
   keyword: string,
+  type: 'all' | 'local' | 'online' = 'all',
   sortOption = 'addtime',
   sortOrder: 'asc' | 'desc' = 'asc'
 ): Promise<GameData[]> {
-  // 如果关键字为空，返回所有游戏
-  if (!keyword || keyword.trim() === '') {
+  // 关键字为空且不筛选类型时，返回所有游戏
+  if ((!keyword || keyword.trim() === '') && type === 'all') {
     return getGames(sortOption, sortOrder);
+  }
+
+  // 关键字为空但需要筛选类型时
+  if ((!keyword || keyword.trim() === '') && type !== 'all') {
+    return filterGamesByType(type, sortOption, sortOrder);
   }
 
   const db = await getDb();
   const { sortField, sortDirection, customSortSql } = getSortConfig(sortOption, sortOrder);
+
+  // 构建类型筛选条件
+  let filterCondition = '';
+  if (type === 'local') {
+    filterCondition = 'AND (localpath IS NOT NULL AND localpath != "")';
+  } else if (type === 'online') {
+    filterCondition = 'AND (localpath IS NULL OR localpath = "")';
+  }
 
   // 使用LIKE进行模糊搜索
   const searchKeyword = `%${keyword}%`;
@@ -138,8 +152,9 @@ export async function searchGames(
     SELECT id, game_id, date, image, summary, name, name_cn, tags, rank, score, time, localpath 
     FROM games
     WHERE 
-      (name_cn LIKE ? OR (name_cn IS NULL OR name_cn = '') AND name LIKE ?)
-      OR name LIKE ?
+      ((name_cn LIKE ? OR (name_cn IS NULL OR name_cn = '') AND name LIKE ?)
+      OR name LIKE ?)
+      ${filterCondition}
   `;
   
   if (customSortSql) {
@@ -149,5 +164,41 @@ export async function searchGames(
   }
   
   const rows = await db.select<GameData[]>(query, [searchKeyword, searchKeyword, searchKeyword]);
+  return processGameRows(rows);
+}
+
+// 根据游戏类型进行筛选（全部/本地/网络）
+export async function filterGamesByType(
+  type: 'all' | 'local' | 'online',
+  sortOption = 'addtime',
+  sortOrder: 'asc' | 'desc' = 'asc'
+): Promise<GameData[]> {
+  if (type === 'all') {
+    return getGames(sortOption, sortOrder);
+  }
+  
+  const db = await getDb();
+  const { sortField, sortDirection, customSortSql } = getSortConfig(sortOption, sortOrder);
+  
+  let filterCondition = '';
+  if (type === 'local') {
+    filterCondition = 'WHERE localpath IS NOT NULL AND localpath != ""';
+  } else if (type === 'online') {
+    filterCondition = 'WHERE localpath IS NULL OR localpath = ""';
+  }
+  
+  let query = `
+    SELECT id, game_id, date, image, summary, name, name_cn, tags, rank, score, time, localpath 
+    FROM games
+    ${filterCondition}
+  `;
+  
+  if (customSortSql) {
+    query += ` ${customSortSql};`;
+  } else {
+    query += ` ORDER BY ${sortField} ${sortDirection};`;
+  }
+  
+  const rows = await db.select<GameData[]>(query);
   return processGameRows(rows);
 }
