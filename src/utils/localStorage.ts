@@ -1,4 +1,6 @@
 import type { GameData } from '@/types/index';
+import { getGamePlatformId } from '.';
+
 
 // 定义本地存储的 key
 const STORAGE_KEY = 'reina_manager_games';
@@ -112,14 +114,14 @@ export function insertGame(game: GameData): void {
 // 删除一条游戏数据
 export function deleteGame(gameId: string): void {
   let games = getGames();
-  games = games.filter(game => game.game_id !== gameId);
+  games = games.filter(game => getGamePlatformId(game) !== gameId);
   setGames(games);
 }
 
 //通过 id 查找本地存储中的游戏数据
 export function getGameByIdLocal(gameId: string): GameData {
   const games = getGames();
-  const game = games.find(game => game.game_id === gameId);
+  const game = games.find(game => getGamePlatformId(game) === gameId);
   return game as GameData;
 }
 
@@ -209,8 +211,8 @@ export function filterGamesByTypeLocal(
   
   if (type === 'all' || type === 'online') {
     return games;
-  } else {
+  } 
     // 浏览器环境中没有本地游戏
     return [];
-  }
+  
 }

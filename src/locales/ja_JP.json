@@ -21,7 +21,15 @@
             "introduction": "紹介",
             "gameScore": "ゲームスコア",
             "releaseDate": "発売日",
-            "gameRanking": "ゲームランキング"
+            "gameRanking": "ゲームランキング",
+            "gameTags": "ゲームタグ",
+            "addTime": "追加時間",
+            "gameDeveloper": "開発者",
+            "gameStats": "ゲーム統計",
+            "playCount": "総プレイ回数",
+            "totalPlayTime": "総プレイ時間",
+            "todayPlayTime": "今日のプレイ時間",
+            "backupCount": "セーブバックアップ数"
         }
     },
     "components": {
@@ -46,7 +54,7 @@
             "sortMethod": "並べ替え方法：",
             "addTime": "追加時間(デフォルト)",
             "releaseTime": "ゲーム発売時間",
-            "bgmRank": "BGM評価ランキング",
+            "Ranking": "総合評価ランキング",
             "ascending": "昇順",
             "descending": "降順",
             "cancel": "キャンセル",
@@ -57,8 +65,7 @@
             "enterDetails": "詳細ページへ",
             "deleteGame": "ゲームを削除",
             "openGameFolder": "ゲームフォルダを開く",
-            "more": "その他",
-            "desktopOnly": "この機能はデスクトップ版でのみ利用可能です"
+            "more": "その他"
         },
         "AlertBox": {
             "cancel": "キャンセル",
@@ -73,6 +80,7 @@
             "selectLauncher": "ランチャーを選択",
             "selectExecutable": "実行ファイルを選択してください",
             "enableCustomMode": "カスタムモードを有効化",
+            "enableVNDB": "VNDB APIを使用する（デフォルトではBGM API）",
             "gameName": "ゲーム名",
             "cancel": "キャンセル",
             "processing": "処理中...",

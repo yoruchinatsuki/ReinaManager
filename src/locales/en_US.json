@@ -21,7 +21,15 @@
             "introduction": "Introduction",
             "gameScore": "Game Score",
             "releaseDate": "Release Date",
-            "gameRanking": "Game Ranking"
+            "gameRanking": "Game Ranking",
+            "gameTags": "Game Tags",
+            "addTime": "Add Time",
+            "gameDeveloper": "Developer",
+            "gameStats": "Game Statistics",
+            "playCount": "Total Play Count",
+            "totalPlayTime": "Total Play Time",
+            "todayPlayTime": "Today's Play Time",
+            "backupCount": "Save Backup Count"
         }
     },
     "components": {
@@ -46,7 +54,7 @@
             "sortMethod": "Sort Method:",
             "addTime": "Add Time (Default)",
             "releaseTime": "Game Release Time",
-            "bgmRank": "BGM Rating Rank",
+            "Ranking": "Overall Rating Rank",
             "ascending": "Ascending",
             "descending": "Descending",
             "cancel": "Cancel",
@@ -57,8 +65,7 @@
             "enterDetails": "Game Details",
             "deleteGame": "Delete Game",
             "openGameFolder": "Open Game Folder",
-            "more": "More",
-            "desktopOnly": "This feature is only available in desktop version"
+            "more": "More"
         },
         "AlertBox": {
             "cancel": "Cancel",
@@ -73,6 +80,7 @@
             "selectLauncher": "Select Launcher",
             "selectExecutable": "Please select an executable file",
             "enableCustomMode": "Enable Custom Mode",
+            "enableVNDB": "Use VNDB API (BGM API by default)",
             "gameName": "Game Name",
             "cancel": "Cancel",
             "processing": "Processing...",

@@ -9,6 +9,7 @@ import FileOpenIcon from '@mui/icons-material/FileOpen';
 import { useModal } from '@/components/Toolbar';
 import { useEffect, useState } from 'react';
 import { fetchFromBgm } from '@/api/bgm';
+import { fetchFromVNDB } from '@/api/vndb';
 import Alert from '@mui/material/Alert';
 import { useStore } from '@/store/';
 import { open } from '@tauri-apps/plugin-dialog';
@@ -17,6 +18,7 @@ import { isTauri } from '@tauri-apps/api/core';
 import Switch from '@mui/material/Switch';
 import { time_now } from '@/utils';
 import { useTranslation } from 'react-i18next';
+import { getGamePlatformId } from '@/utils';
 
 const AddModal: React.FC = () => {
     const { t } = useTranslation();
@@ -27,6 +29,7 @@ const AddModal: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [path, setPath] = useState('');
     const [customMode, setCustomMode] = useState(false);
+    const [isVNDB, setIsVNDB] = useState(false);
 
     // 当路径变化时，更新文本字段
     useEffect(() => {
@@ -46,7 +49,7 @@ const AddModal: React.FC = () => {
             return;
         }
         if (customMode) {
-            await addGame({ game_id: String(time_now().getTime()), localpath: path, name: formText, name_cn: '', image: "/images/default.png", time: time_now() });
+            await addGame({ bgm_id: String(time_now().getTime()), localpath: path, name: formText, name_cn: '', image: "/images/default.png", time: time_now() });
             setFormText('');
             setPath('');
             handleClose();
@@ -54,7 +57,9 @@ const AddModal: React.FC = () => {
         }
         try {
             setLoading(true); // 开始加载
-            const res = await fetchFromBgm(formText, bgmToken);
+
+            const res = isVNDB ? (await fetchFromVNDB(formText)) : (await fetchFromBgm(formText, bgmToken));
+
             if (typeof res === 'string') {
                 setError(res);
                 setTimeout(() => {
@@ -62,7 +67,7 @@ const AddModal: React.FC = () => {
                 }, 5000);
                 return null;
             }
-            if (games.find((game) => game.game_id === res.game_id)) {
+            if (games.find((game) => getGamePlatformId(game) === getGamePlatformId(res) || game.name === res.name || game.name_cn === res.name_cn)) {
                 setError(t('components.AddModal.gameExists'));
                 setTimeout(() => {
                     setError('');
@@ -133,6 +138,14 @@ const AddModal: React.FC = () => {
                             setCustomMode(!customMode)
                         }} />
                         <span>{t('components.AddModal.enableCustomMode')}</span>
+                        <div>
+                            <Switch checked={isVNDB} onChange={() => {
+                                setIsVNDB(!isVNDB)
+                            }} />
+                            <span>{t('components.AddModal.enableVNDB')}</span>
+                        </div>
+
+
                     </div>
 
 

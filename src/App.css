@@ -1,3 +1,7 @@
+html, body {
+  overscroll-behavior: none; /* 禁用弹性滚动 */
+}
+
 /* 默认状态下：限制溢出，并显示为省略号 */
 .MuiDrawer-paper .MuiListItemText-root .MuiTypography-root  {
   white-space: nowrap;

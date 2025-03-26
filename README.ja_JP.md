@@ -7,7 +7,7 @@
 
 <h1>ReinaManager</h1>
 
-![Status](https://img.shields.io/badge/status-active-brightgreen) ![Stage](https://img.shields.io/badge/stage-beta-blue)
+![Status](https://img.shields.io/badge/status-active-brightgreen) ![Stage](https://img.shields.io/badge/stage-beta-blue) ![Build Status](https://github.com/huoshen80/ReinaManager/actions/workflows/build.yml/badge.svg)
 
 <p align="center"><a href="./README.md">English</a>|<a href="./README.zh_CN.md">中文</a>|<a href="./README.zh_TW.md">繁體中文</a>|日本語</p>
 
@@ -32,12 +32,24 @@
 - [x] ゲームを起動するための実行ファイルを追加
 - [x] ローカルゲームフォルダを開く
 - [ ] ホームページ機能
-- [ ] ゲーム検索のためのVNDB APIを追加
+- [x] ゲーム検索のためのVNDB APIを追加
 - [x] 多言語対応
 - [ ] ゲームのカスタムデータ
 - [ ] プレイ時間のカウント
 - [ ] 各ページの美化
-- [ ] 詳細ページのデザイン
+- [x] 詳細ページのデザイン
+
+## デモバージョン
+
+##### フロントエンドデモ
+- ウェブ版を試す: [https://reina.huoshen80.top](https://reina.huoshen80.top)
+
+##### デスクトップアプリケーションデモ
+- GitHub Actionsから最新のビルドをダウンロード:
+  1. [Actionsページ](https://github.com/huoshen80/ReinaManager/actions/workflows/build.yml)に移動
+  2. 最新の成功したワークフローの実行をクリック
+  3. 「Artifacts」セクションまでスクロール
+  4. 必要なアーティファクトをダウンロード
 
 ## ライセンス
 

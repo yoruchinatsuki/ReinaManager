@@ -89,7 +89,7 @@ const SortOption = ({ value, onChange }: { value: string, onChange: (value: stri
             <Select value={value} onChange={handleChange}>
                 <MenuItem value="addtime">{t('components.SortModal.addTime')}</MenuItem>
                 <MenuItem value="datetime">{t('components.SortModal.releaseTime')}</MenuItem>
-                <MenuItem value="rank">{t('components.SortModal.bgmRank')}</MenuItem>
+                <MenuItem value="rank">{t('components.SortModal.Ranking')}</MenuItem>
             </Select>
         </div>
     );

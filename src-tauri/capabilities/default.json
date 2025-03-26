@@ -13,6 +13,9 @@
     "core:path:allow-dirname",
     "shell:allow-open",
     "fs:default",
+    "fs:allow-copy-file",
+    "fs:allow-appdata-write",
+    "fs:allow-appdata-write-recursive",
     {
       "identifier": "fs:scope",
       "allow": [

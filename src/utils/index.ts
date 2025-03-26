@@ -1,7 +1,7 @@
 import { open } from '@tauri-apps/plugin-shell';
 import { invoke, isTauri } from '@tauri-apps/api/core';
 import {path} from '@tauri-apps/api';
-import type { HanleGamesProps } from '@/types';
+import type { GameData, HanleGamesProps } from '@/types';
 import { createTheme } from '@mui/material/styles';
 
 
@@ -94,4 +94,11 @@ export const handleStartGame = async ({id,getGameById}:HanleGamesProps) => {
             console.error('打开文件夹失败:', error);
         }
     }
+
+export function getGamePlatformId(game: GameData): string | undefined {
+  // 严格检查：非空字符串
+  if (game.bgm_id && game.bgm_id.trim() !== "") return game.bgm_id;
+  if (game.vndb_id && game.vndb_id.trim() !== "") return game.vndb_id;
+  return undefined;
+}
 

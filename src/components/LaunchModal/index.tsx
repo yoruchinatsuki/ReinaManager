@@ -10,7 +10,23 @@ interface LaunchModalProps {
 
 export const LaunchModal = ({ game_id }: LaunchModalProps) => {
     const { t } = useTranslation(); // 使用翻译函数
-    const { selectedGameId, getGameById } = useStore();
+    const { selectedGameId, getGameById, useIsLocalGame } = useStore();
+
+    // 确定是否可以启动游戏
+    // 正确的canUse函数实现
+    const canUse = (): boolean => {
+        // 如果不是Tauri环境，无法启动游戏
+        if (!isTauri()) return false;
+
+        // 确定要使用的游戏ID（优先使用props传入的，否则使用全局状态）
+        const effectiveGameId = game_id || selectedGameId;
+
+        // 如果没有有效的游戏ID，无法启动
+        if (!effectiveGameId) return false;
+
+        // 检查是否为本地游戏，只有本地游戏才能启动
+        return useIsLocalGame(effectiveGameId);
+    };
 
     const handleStartGame = async (id?: string) => {
         if (!selectedGameId || (id === undefined && !selectedGameId)) {
@@ -38,13 +54,12 @@ export const LaunchModal = ({ game_id }: LaunchModalProps) => {
         <Button
             startIcon={<PlayArrowIcon />}
             onClick={() => {
-                console.log(game_id);
                 if (game_id)
                     handleStartGame(game_id);
                 else
                     handleStartGame();
             }}
-            disabled={!selectedGameId || !isTauri()} // 当没有选择游戏时禁用按钮
+            disabled={!canUse()} // 当没有选择游戏时禁用按钮
         >
             {t('components.LaunchModal.launchGame')}
         </Button>

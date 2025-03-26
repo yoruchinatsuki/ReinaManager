@@ -1,6 +1,6 @@
 [package]
 name = "reina-manager"
-version = "0.2.0"
+version = "0.3.0"
 description = "A Tauri App"
 authors = ["you"]
 license = "GNU AFFERO GENERAL PUBLIC LICENSE"

@@ -11,6 +11,7 @@ import { Toolbars } from '@/components/Toolbar';
 import { SearchBox } from '@/components/SearchBox';
 import { PageContainer } from '@toolpad/core';
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface CustomAppTitleProps {
     isLibraries: boolean;
@@ -38,6 +39,8 @@ const CustomAppTitle = ({ isLibraries }: CustomAppTitleProps) => {
 
 
 export const Layout: React.FC = () => {
+    const { i18n } = useTranslation();
+    const isja_JP = i18n.language === 'ja-JP';
     const path = useLocation().pathname;
     const isLibraries = path === "/libraries";
     const AppTitle = useMemo(() => {
@@ -50,7 +53,7 @@ export const Layout: React.FC = () => {
                 appTitle: AppTitle,
                 toolbarActions: Toolbars,
                 sidebarFooter: SidebarFooter,
-            }} sidebarExpandedWidth={220} defaultSidebarCollapsed={true}
+            }} sidebarExpandedWidth={isja_JP ? 250 : 220} defaultSidebarCollapsed={true}
         >
             {isLibraries ?
                 <PageContainer sx={{ maxWidth: '100% !important' }}>

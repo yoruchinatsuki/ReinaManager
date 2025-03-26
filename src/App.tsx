@@ -10,6 +10,7 @@ import { useStore } from './store';
 import { useTranslation } from 'react-i18next';
 import { ThemeProvider } from '@mui/material/styles';
 import { Buttontheme } from '@/utils';
+import { getGamePlatformId } from '@/utils';
 
 const App: React.FC = () => {
   const { t } = useTranslation();
@@ -17,7 +18,7 @@ const App: React.FC = () => {
   const lists = games.map((game) => {
     return {
       title: game.name_cn === "" ? game.name : game.name_cn,
-      segment: game.game_id
+      segment: getGamePlatformId(game)
     }
   })
   const NAVIGATION: Navigation = [

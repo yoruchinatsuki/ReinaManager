@@ -21,7 +21,15 @@
             "introduction": "簡介",
             "gameScore": "遊戲評分",
             "releaseDate": "遊戲發布時間",
-            "gameRanking": "遊戲排行"
+            "gameRanking": "遊戲排行",
+            "gameTags": "遊戲標籤",
+            "addTime": "添加時間",
+            "gameDeveloper": "開發",
+            "gameStats": "遊戲統計",
+            "playCount": "累計遊戲次數",
+            "totalPlayTime": "累計總時長",
+            "todayPlayTime": "今日遊戲時長",
+            "backupCount": "存檔備份數"
         }
     },
     "components": {
@@ -46,7 +54,7 @@
             "sortMethod": "排序方法：",
             "addTime": "添加時間(默認)",
             "releaseTime": "遊戲發布時間",
-            "bgmRank": "BGM評分綜合排名",
+            "Ranking": "綜合評分排名",
             "ascending": "升序",
             "descending": "降序",
             "cancel": "取消",
@@ -57,8 +65,7 @@
             "enterDetails": "進入詳情頁",
             "deleteGame": "刪除遊戲",
             "openGameFolder": "開啟遊戲目錄",
-            "more": "更多",
-            "desktopOnly": "此功能僅在桌面版可用"
+            "more": "更多"
         },
         "AlertBox": {
             "cancel": "取消",
@@ -73,6 +80,7 @@
             "selectLauncher": "選擇啟動程序",
             "selectExecutable": "請選擇一個可執行程序",
             "enableCustomMode": "啟用自定義模式",
+            "enableVNDB": "使用VNDB api(默認使用BGM api)",
             "gameName": "遊戲名稱",
             "cancel": "取消",
             "processing": "處理中...",

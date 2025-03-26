@@ -21,9 +21,11 @@ import {
 } from '@/utils/localStorage';
 import { getBgmTokenRepository, setBgmTokenRepository } from '@/utils/settingsConfig';
 import { isTauri } from '@tauri-apps/api/core';
+import { getGamePlatformId } from '@/utils';
+import { resetDatabase } from '@/utils/database';
 
 // 定义应用全局状态类型
-interface AppState {
+export interface AppState {
   updateSort(option: string, sortOrder: string): Promise<void>;
   // 游戏相关状态与方法
   games: GameData[];
@@ -51,7 +53,7 @@ interface AppState {
   setBgmToken: (token: string) => Promise<void>;
   
   // UI 操作方法
-  setSelectedGameId: (id: string | null) => void;
+  setSelectedGameId: (id: string | null|undefined) => void;
   
   // 初始化
   initialize: () => Promise<void>;
@@ -66,6 +68,7 @@ interface AppState {
 
   gameFilterType: 'all' | 'local' | 'online';
   setGameFilterType: (type: 'all' | 'local' | 'online') => void;
+  useIsLocalGame: (gameId: string) => boolean;
 }
 
 // 创建持久化的全局状态
@@ -143,7 +146,8 @@ refreshGameData: async (customSortOption?: string, customSortOrder?: 'asc' | 'de
             set({ games: data });
           }
         } catch (error) {
-          console.error('获取游戏数据失败:', error);
+          resetDatabase();
+          console.error("获取游戏数据失败，已重置数据库:", error);
           set({ games: [] });
         } finally {
           set({ loading: false });
@@ -306,7 +310,7 @@ setSortOrder: (order: 'asc' | 'desc') => {
       },
       
       // UI 操作方法
-      setSelectedGameId: (id: string | null) => {
+      setSelectedGameId: (id: string | null|undefined) => {
         set({ selectedGameId: id });
       },
 
@@ -354,7 +358,20 @@ setGameFilterType: (type: 'all' | 'local' | 'online') => {
     set({ loading: false });
   }
 },
-      
+useIsLocalGame(gameId: string  ): boolean {
+    const games = useStore.getState().games; // 使用getState()而不是闭包中的state
+    
+    // 查找游戏
+    const game = games.find(g => getGamePlatformId(g) === gameId);
+    
+    // 检查游戏是否存在并且有localpath属性
+    if (!game || !game.localpath){
+      return false;
+    } 
+    
+    // 检查localpath是否为非空字符串
+    return game.localpath.trim() !== '';
+},
       // 初始化方法，先初始化数据库，然后加载所有需要的数据
       initialize: async () => {        
         // 然后并行加载其他数据

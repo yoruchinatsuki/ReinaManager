@@ -16,8 +16,8 @@
         "title": "ReinaManager Ciallo～(∠・ω< )⌒★",
         "width": 1200,
         "height": 700,
-        "minWidth": 962,
-        "minHeight": 542,
+        "minWidth": 1024,
+        "minHeight": 596,
         "resizable": true,
         "fullscreen": false
       }

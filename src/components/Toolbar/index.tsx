@@ -60,14 +60,15 @@ export const ToLibraries = () => {
     );
 }
 
-const OpenFolder = ({ id, getGameById }: HanleGamesProps) => {
+const OpenFolder = ({ id, getGameById, canUse }: HanleGamesProps) => {
     const { t } = useTranslation();
+
     return (
         <Button
             startIcon={<FolderOpenIcon />}
             color="primary"
             variant="text"
-            disabled={!isTauri()}
+            disabled={typeof canUse === 'function' ? !canUse() : true}
             onClick={() =>
                 handleOpenFolder({ id, getGameById })
             }
@@ -106,7 +107,14 @@ export const DeleteModal: React.FC<{ id: string }> = ({ id }) => {
 export const Buttongroup = ({ isLibraries, isDetail }: ButtonGroupProps) => {
     // 使用useParams获取URL参数
     const { id } = useParams<{ id: string }>();
-    const { getGameById } = useStore();
+    const { getGameById, useIsLocalGame } = useStore();
+
+    // 确定是否可以启动游戏
+    const canUse = () => {
+        if (id !== undefined && id !== null)
+            return isTauri() && useIsLocalGame(id);
+        return false;
+    }
 
     return (
         <>
@@ -114,7 +122,7 @@ export const Buttongroup = ({ isLibraries, isDetail }: ButtonGroupProps) => {
                 id) &&
                 <>
                     <LaunchModal game_id={id} />
-                    <OpenFolder id={id} getGameById={getGameById} />
+                    <OpenFolder id={id} getGameById={getGameById} canUse={canUse} />
                     <DeleteModal id={id} />
                 </>
             }
