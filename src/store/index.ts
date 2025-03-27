@@ -22,7 +22,6 @@ import {
 import { getBgmTokenRepository, setBgmTokenRepository } from '@/utils/settingsConfig';
 import { isTauri } from '@tauri-apps/api/core';
 import { getGamePlatformId } from '@/utils';
-import { resetDatabase } from '@/utils/database';
 
 // 定义应用全局状态类型
 export interface AppState {
@@ -146,8 +145,7 @@ refreshGameData: async (customSortOption?: string, customSortOrder?: 'asc' | 'de
             set({ games: data });
           }
         } catch (error) {
-          resetDatabase();
-          console.error("获取游戏数据失败，已重置数据库:", error);
+          console.error("获取游戏数据失败", error);
           set({ games: [] });
         } finally {
           set({ loading: false });
@@ -376,8 +374,8 @@ useIsLocalGame(gameId: string  ): boolean {
       initialize: async () => {        
         // 然后并行加载其他数据
         await Promise.all([
-          get().fetchBgmToken(),
-          get().fetchGames()
+          get().fetchGames(),
+          get().fetchBgmToken()
         ]);
       }
     }),

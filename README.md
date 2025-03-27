@@ -11,7 +11,7 @@
 
 <p align="center">English|<a href="./README.zh_CN.md">中文</a>|<a href="./README.zh_TW.md">繁體中文</a>|<a href="./README.ja_JP.md">日本語</a></p>
 
-<h5>A lightweight visual novel management ,Under development...</h5>
+<h5>A lightweight visual novel manager,Under development...</h5>
 
 The `Reina` in the name is the character <a href="https://vndb.org/c64303"><b>妃 玲奈(Kisaki Reina)</b></a> from game <a href="https://vndb.org/v21852"><b>金色ラブリッチェ(Kin'iro Loveriche)</b></a>
 

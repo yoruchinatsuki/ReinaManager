@@ -1,60 +1,35 @@
 import Database  from '@tauri-apps/plugin-sql';
 import { exists, BaseDirectory,mkdir,remove,copyFile } from '@tauri-apps/plugin-fs';
 
+let check=true;
+let dbInstance: Database | null = null;
 
 export async function initDatabase() {
-  const appDataExists = await exists('', { baseDir: BaseDirectory.AppData });
-    if (!appDataExists) {
-      // 创建应用数据文件夹
-      await mkdir('', { baseDir: BaseDirectory.AppData, recursive: true });
+    // 检查数据库目录并创建（包括父目录）
+    if (!await exists('data', { baseDir: BaseDirectory.AppData })) {
+      await mkdir('data', { 
+        baseDir: BaseDirectory.AppData, 
+        recursive: true  // recursive确保所有父目录也被创建
+      });
+      console.log("已创建数据目录");
     }
 
- const existsdata= await exists('data', { baseDir: BaseDirectory.AppData });
-  if(!existsdata){
-    await mkdir('data', {
-  baseDir: BaseDirectory.AppData,
-});
-}
+const existdb= await exists('data/reina_manager.db', { baseDir: BaseDirectory.AppData });
+  if(!existdb){
+    const db = await Database.load('sqlite:data/reina_manager.db');
+    createTable(db);
+  }
   
 // 加载 SQLite 数据库，如果不存在则会自动创建
   const db = await Database.load('sqlite:data/reina_manager.db');
 
-
-
-  // 创建存储游戏数据的表，注意将 tags 以 JSON 字符串形式存储
-  await db.execute(`
-    CREATE TABLE IF NOT EXISTS games (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      bgm_id TEXT,
-      vndb_id TEXT,
-      date TEXT,
-      image TEXT,
-      summary TEXT,
-      name TEXT,
-      name_cn TEXT,
-      tags TEXT,
-      rank INTEGER,
-      score REAL,
-      time TEXT,
-      localpath TEXT,
-      developer TEXT,
-      all_titles TEXT,
-      aveage_hours REAL
-    );
-  `);
-
-  // 创建 user 表，仅存储一条记录，用于保存 BGM_TOKEN
-  await db.execute(`
-    CREATE TABLE IF NOT EXISTS user (
-      id INTEGER PRIMARY KEY,
-      BGM_TOKEN TEXT
-    );
-  `);
-
+  if(check&&(!await checkDatabaseStructure(db))){
+    resetDatabase();
+    await createTable(db);
+  }
+  
   return db;
 }
-
-let dbInstance: Database | null = null;
 
 export async function getDb() {
   if (!dbInstance) {
@@ -92,9 +67,6 @@ export async function backupDatabase(): Promise<string> {
   } catch (error) {
     console.error('备份数据库失败:', error);
     throw error;
-  } finally {
-    // 重新连接数据库
-    dbInstance = await getDb();
   }
 }
 
@@ -114,10 +86,92 @@ export async function resetDatabase(): Promise<void> {
     await remove('data/reina_manager.db', { baseDir: BaseDirectory.AppData });
     
     // 重新初始化，会创建全新数据库
+
     dbInstance = await initDatabase();
     console.log('数据库已重置');
   } catch (error) {
     console.error('重置数据库失败:', error);
     throw error;
   }
+}
+
+// 检查数据库表结构
+async function checkDatabaseStructure(db: Database): Promise<boolean> {
+  check=false;
+  try {
+    // 定义预期表结构
+    const requiredColumns = {
+      'games': [
+        'id', 'bgm_id', 'vndb_id', 'date', 'image', 'summary', 'name', 
+        'name_cn', 'tags', 'rank', 'score', 'time', 'localpath', 
+        'developer', 'all_titles', 'aveage_hours'
+      ],
+      'user': [
+        'id', 'BGM_TOKEN'
+      ]
+    };
+    
+    // 检查每个表结构
+    for (const [tableName, columns] of Object.entries(requiredColumns)) {
+      // 检查表是否存在
+      const tableExists = await db.select<{count: number}[]>(
+        `SELECT count(*) as count FROM sqlite_master WHERE type='table' AND name=?;`,
+        [tableName]
+      );
+      
+      if (tableExists[0].count === 0) {
+        console.log(`表 ${tableName} 不存在`);
+        return false;
+      }
+      
+      // 获取表的列信息
+      const tableInfo = await db.select<{name: string}[]>(`PRAGMA table_info(${tableName});`);
+      const existingColumns = tableInfo.map(col => col.name);
+      
+      // 检查是否有缺失的列
+      for (const column of columns) {
+        if (!existingColumns.includes(column)) {
+          console.log(`表 ${tableName} 缺少列: ${column}`);
+          return false;
+        }
+      }
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('检查数据库结构时出错:', error);
+    return false;
+  }
+}
+
+const createTable=async(db:Database)=>{
+  // 创建存储游戏数据的表，注意将 tags 以 JSON 字符串形式存储
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS games (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      bgm_id TEXT,
+      vndb_id TEXT,
+      date TEXT,
+      image TEXT,
+      summary TEXT,
+      name TEXT,
+      name_cn TEXT,
+      tags TEXT,
+      rank INTEGER,
+      score REAL,
+      time TEXT,
+      localpath TEXT,
+      developer TEXT,
+      all_titles TEXT,
+      aveage_hours REAL
+    );
+  `);
+
+  // 创建 user 表，仅存储一条记录，用于保存 BGM_TOKEN
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS user (
+      id INTEGER PRIMARY KEY,
+      BGM_TOKEN TEXT
+    );
+  `);
 }

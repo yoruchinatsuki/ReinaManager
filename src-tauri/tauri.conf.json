@@ -1,6 +1,6 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "reina-manager",
+  "productName": "ReinaManager",
   "version": "../package.json",
   "identifier": "com.reinamanager.dev",
   "build": {
@@ -36,11 +36,12 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "copyright": "© Copyright 2025 huoshen80",
+    "copyright": "Copyright © 2025 huoshen80",
+    "publisher": "huoshen80",
     "windows": {
       "nsis": {
         "installerIcon": "icons/icon.ico"
       }
     }
+    }
   }
-}
