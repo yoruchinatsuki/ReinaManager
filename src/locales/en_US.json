@@ -29,7 +29,9 @@
             "playCount": "Total Play Count",
             "totalPlayTime": "Total Play Time",
             "todayPlayTime": "Today's Play Time",
-            "backupCount": "Save Backup Count"
+            "backupCount": "Save Backup Count",
+            "gameDatafrom": "Data Source",
+            "expected_hours": "Expected Hours"
         }
     },
     "components": {
@@ -47,7 +49,8 @@
         "LaunchModal": {
             "launchGame": "Launch Game",
             "gamePathNotFound": "Game path not found",
-            "launchFailed": "Failed to launch game:"
+            "launchFailed": "Failed to launch game:",
+            "playing": "Playing..."
         },
         "SortModal": {
             "sort": "Sort",

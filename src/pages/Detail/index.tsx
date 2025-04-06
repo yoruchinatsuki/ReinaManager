@@ -1,138 +1,185 @@
 import { useStore } from '@/store';
+import { useGamePlayStore } from '@/store/gamePlayStore';
 import { PageContainer } from '@toolpad/core';
 import { useLocation } from 'react-router';
 import type { GameData } from '@/types';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Typography, Box, Stack, Chip, Paper } from '@mui/material';
 import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
 import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import TodayIcon from '@mui/icons-material/Today';
 import BackupIcon from '@mui/icons-material/Backup';
-
+import { CircularProgress } from '@mui/material';
+import type { GameTimeStats } from '@/types';
+import { getGamePlatformId } from '@/utils';
 
 interface InfoBoxProps {
     game: GameData;
 }
 
-// 封装的统计信息组件
-const InfoBox: React.FC<InfoBoxProps> = () => {
+// 封装的统计信息组件 - 简化为演示结构，等待重构
+const InfoBox: React.FC<InfoBoxProps> = ({ game }) => {
     const { t } = useTranslation();
+    const [loading, setLoading] = useState(false);
+    const [isInitialLoad, setIsInitialLoad] = useState(true);
+    const { loadGameStats, runningGameIds } = useGamePlayStore();
+    const [stats, setStats] = useState<GameTimeStats | null>(null);
+    const gameId = getGamePlatformId(game) as string;
 
+    // 存储上一次游戏运行状态，用于检测变化
+    const prevRunningRef = useRef(false);
 
-    // 统计数据项（颜色、图标、标题、值）
-    const statsItems = [
+    // 定义并保存 fetchStats 函数
+    const fetchStats = useCallback(async (silent = false) => {
+        // 仅当不是静默更新或初始加载时，设置加载状态为true
+        if (!silent) {
+            setLoading(true);
+        }
+        try {
+            const gameStats = await loadGameStats(gameId, true); // 强制刷新
+            setStats(gameStats);
+            if (isInitialLoad) {
+                setIsInitialLoad(false);
+            }
+        } catch (error) {
+            console.error('加载游戏统计失败:', error);
+        } finally {
+            setLoading(false);
+            if (!silent) {
+                setLoading(false);
+            }
+        }
+    }, [gameId, loadGameStats, isInitialLoad]);
+
+    // 初始加载数据
+    useEffect(() => {
+        fetchStats();
+    }, [fetchStats]);
+
+    // 监听当前游戏的运行状态变化
+    useEffect(() => {
+        // 检查当前游戏是否正在运行
+        const isCurrentGameRunning = runningGameIds.has(gameId);
+
+        // 如果游戏从运行状态变为非运行状态，刷新统计
+        if (prevRunningRef.current && !isCurrentGameRunning) {
+            // 游戏刚刚关闭，延迟一点执行以确保后端数据已更新
+            setTimeout(() => {
+                fetchStats(true);// 静默更新
+            }, 500);
+        }
+
+        // 更新状态引用
+        prevRunningRef.current = isCurrentGameRunning;
+    }, [runningGameIds, gameId, fetchStats]);
+
+    // 统计项数据
+    const statItems = [
         {
             color: 'primary',
             icon: <SportsEsportsIcon fontSize="small" />,
             title: t('pages.Detail.playCount'),
-            // value: game.playCount || '0'
-            value: '0'
-        },
-        {
-            color: 'primary',
-            icon: <AccessTimeIcon fontSize="small" />,
-            title: t('pages.Detail.totalPlayTime'),
-            // value: game.totalPlayTime ? `${game.totalPlayTime}h` : '0h'
-            value: '0'
+            value: stats ? `${stats.sessionCount}` : '0'
         },
         {
             color: 'primary',
             icon: <TodayIcon fontSize="small" />,
             title: t('pages.Detail.todayPlayTime'),
-            // value: game.todayPlayTime ? `${game.todayPlayTime}h` : '0h'
-            value: '0'
+            value: stats ? `${stats.todayPlayTime}` : '0分钟'
+        },
+        {
+            color: 'primary',
+            icon: <AccessTimeIcon fontSize="small" />,
+            title: t('pages.Detail.totalPlayTime'),
+            value: stats ? `${stats.totalPlayTime}` : '0分钟'
         },
         {
             color: 'primary',
             icon: <BackupIcon fontSize="small" />,
             title: t('pages.Detail.backupCount'),
-            // value: game.backupCount || '0'
-            value: '0'
+            value: '0' // 备份功能暂未实现，保留原值
         }
     ];
 
-    // 统计框背景色映射
-    const bgColors = {
-        primary: 'rgba(25, 118, 210, 0.04)',
-    };
-
-    // 统计框边框色映射
-    const borderColors = {
-        primary: 'rgba(25, 118, 210, 0.1)',
-    };
-
     return (
-        <Box sx={{ mt: 4, mb: 3 }}>
+        <Box className="mt-16 mb-12">
             <Typography variant="h6" fontWeight="bold" gutterBottom>
                 {t('pages.Detail.gameStats')}
             </Typography>
 
-            <Stack
-                direction="row"
-                spacing={2}
-                sx={{
-                    width: '100%',
-                    '& > *': { width: 'calc(25% - 12px)' } // 确保每个项目占据相等宽度
-                }}
-            >
-                {statsItems.map((item) => (
-                    <Paper
-                        key={item.title}
-                        elevation={0}
-                        sx={{
-                            p: 2,
-                            bgcolor: bgColors[item.color as keyof typeof bgColors],
-                            borderRadius: 2,
-                            border: `1px solid ${borderColors[item.color as keyof typeof borderColors]}`,
-                            minWidth: 0, // 允许缩小到比内容更小
-                            overflow: 'hidden' // 确保内容不溢出
-                        }}
-                    >
-                        <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 1 }}>
-                            <Box sx={{ color: `${item.color}.main` }}>{item.icon}</Box>
-                            <Typography
-                                variant="body2"
-                                fontWeight="medium"
-                                color="textSecondary"
-                                noWrap // 防止长标题换行
-                                title={item.title} // 添加tooltip
+            <div className="grid grid-cols-4 gap-4">
+                {loading ? (
+                    <div className="flex justify-center w-full py-4 col-span-full">
+                        <CircularProgress size={24} />
+                    </div>
+                ) : (
+                    statItems.map((item) => {
+                        return (
+                            <Paper
+                                key={item.title}
+                                elevation={0}
+                                className={`
+                                p-4 rounded-lg overflow-hidden
+                                transition-all duration-200
+                                hover:shadow-md hover:scale-[1.02]
+                                ${item.color === 'primary' ? 'bg-blue-50/40 border border-blue-100/40' : 'bg-green-50/40 border border-green-100/40'}
+                            `}
                             >
-                                {item.title}
-                            </Typography>
-                        </Stack>
-                        <Typography variant="h6" fontWeight="bold">
-                            {item.value}
-                        </Typography>
-                    </Paper>
-                ))}
-            </Stack>
+                                <div className="flex items-center space-x-2 mb-2">
+                                    <span className="text-[#1976d2] flex-shrink-0 flex items-center">
+                                        {item.icon}
+                                    </span>
+                                    <Typography
+                                        variant="body2"
+                                        className="font-medium text-gray-600 truncate"
+                                        title={item.title}
+                                    >
+                                        {item.title}
+                                    </Typography>
+                                </div>
+                                <Typography variant="h6" className="font-bold">
+                                    {item.value}
+                                </Typography>
+                            </Paper>
+                        );
+                    })
+                )}
+            </div>
         </Box>
     );
 };
 
+// 游戏详情页面
 export const Detail: React.FC = () => {
     const { t } = useTranslation();
-    const { getGameById } = useStore();
+    const { getGameById, setSelectedGameId } = useStore();
     const [game, setGame] = useState<GameData | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const id = useLocation().pathname.split('/').pop();
+
+    // 加载游戏数据
     useEffect(() => {
         if (!id) return;
+        setLoading(true);
         getGameById(id)
-            .then(data => setGame(data))
+            .then(data => {
+                setGame(data);
+                // 设置当前选中的游戏ID，以便LaunchModal可以正确工作
+                setSelectedGameId(id);
+            })
             .catch(error => {
                 console.error('获取游戏数据失败:', error);
             })
             .finally(() => setLoading(false));
-    }, [id, getGameById]);
+    }, [id, getGameById, setSelectedGameId]);
 
     if (loading) return <div>{t('pages.Detail.loading')}</div>;
     if (!game) return <div>{t('pages.Detail.notFound')}</div>;
-    return (
 
+    return (
         <PageContainer sx={{ maxWidth: '100% !important' }}>
-            <Box sx={{ p: 2 }}>
+            <Box className="p-2">
                 {/* 顶部区域：图片和基本信息 */}
                 <Stack direction={{ xs: 'column', md: 'row' }} spacing={3}>
                     {/* 左侧：游戏图片 */}
@@ -145,19 +192,10 @@ export const Detail: React.FC = () => {
                     </Box>
 
                     {/* 右侧：游戏信息 */}
-                    <Box sx={{ flex: 1 }}>
-                        {/* 修复换行样式问题的Stack */}
+                    <Box className="flex-1">
                         <Stack
-                            spacing={0} // 移除原始间距
                             direction={{ xs: 'column', sm: 'row' }}
-                            sx={{
-                                flexWrap: 'wrap',
-                                display: 'flex',
-                                '& > div': {
-                                    mr: 5,  // 右边距
-                                    mb: 2,  // 底部边距，替代spacing属性
-                                }
-                            }}
+                            className="flex flex-wrap [&>div]:mr-6 [&>div]:mb-2"
                         >
                             {game.image !== "/images/default.png" &&
                                 <Box>
@@ -179,12 +217,17 @@ export const Detail: React.FC = () => {
                                 <Typography variant="subtitle2" fontWeight="bold">{t('pages.Detail.addTime')}</Typography>
                                 <Typography>{new Date(game.time).toLocaleDateString()}</Typography>
                             </Box>
-
-                            {game.rank &&
+                            {game.rank !== 0 && game.rank !== null &&
                                 <Box>
                                     <Typography variant="subtitle2" fontWeight="bold">{t('pages.Detail.gameRanking')}</Typography>
                                     <Typography>{game.rank || '-'}</Typography>
                                 </Box>}
+                            {game.aveage_hours !== null &&
+                                <Box>
+                                    <Typography variant="subtitle2" fontWeight="bold">{t('pages.Detail.expected_hours')}</Typography>
+                                    <Typography>{game.aveage_hours || '-'}h</Typography>
+                                </Box>}
+
                             <Box>
                                 <Typography variant="subtitle2" fontWeight="bold">{t('pages.Detail.gameScore')}</Typography>
                                 <Typography>{game.score || '-'}</Typography>
@@ -192,9 +235,9 @@ export const Detail: React.FC = () => {
                         </Stack>
 
                         {/* 标签 */}
-                        <Box sx={{ mt: 2 }}>
+                        <Box className="mt-2">
                             <Typography variant="subtitle2" fontWeight="bold" gutterBottom>{t('pages.Detail.gameTags')}</Typography>
-                            <Stack direction="row" sx={{ flexWrap: 'wrap', gap: 1 }}>
+                            <Stack direction="row" className="flex-wrap gap-1">
                                 {game.tags?.map(tag => (
                                     <Chip key={tag} label={tag} size="small" variant="outlined" />
                                 ))}
@@ -203,12 +246,13 @@ export const Detail: React.FC = () => {
                     </Box>
                 </Stack>
 
+                {/* 统计信息卡片 */}
                 <InfoBox game={game} />
 
                 {/* 游戏简介 */}
-                <Box sx={{ mt: 3 }}>
+                <Box className="mt-3">
                     <Typography variant="h6" fontWeight="bold">{t('pages.Detail.introduction')}</Typography>
-                    <Typography sx={{ mt: 1 }}>{game.summary}</Typography>
+                    <Typography className="mt-1">{game.summary}</Typography>
                 </Box>
             </Box>
         </PageContainer>

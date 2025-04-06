@@ -29,7 +29,9 @@
             "playCount": "総プレイ回数",
             "totalPlayTime": "総プレイ時間",
             "todayPlayTime": "今日のプレイ時間",
-            "backupCount": "セーブバックアップ数"
+            "backupCount": "セーブバックアップ数",
+            "gameDatafrom": "データソース",
+            "expected_hours": "予想プレイ時間"
         }
     },
     "components": {
@@ -47,7 +49,8 @@
         "LaunchModal": {
             "launchGame": "ゲームを起動",
             "gamePathNotFound": "ゲームパスが見つかりません",
-            "launchFailed": "ゲーム起動に失敗しました:"
+            "launchFailed": "ゲーム起動に失敗しました:",
+            "playing": "プレイ中..."
         },
         "SortModal": {
             "sort": "並べ替え",

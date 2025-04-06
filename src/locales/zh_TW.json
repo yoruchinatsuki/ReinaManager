@@ -29,7 +29,9 @@
             "playCount": "累計遊戲次數",
             "totalPlayTime": "累計總時長",
             "todayPlayTime": "今日遊戲時長",
-            "backupCount": "存檔備份數"
+            "backupCount": "存檔備份數",
+            "gameDatafrom": "數據來源",
+            "expected_hours": "預計時長"
         }
     },
     "components": {
@@ -47,7 +49,8 @@
         "LaunchModal": {
             "launchGame": "啟動遊戲",
             "gamePathNotFound": "遊戲路徑未找到",
-            "launchFailed": "遊戲啟動失敗:"
+            "launchFailed": "遊戲啟動失敗:",
+            "playing": "遊戲中..."
         },
         "SortModal": {
             "sort": "排序",

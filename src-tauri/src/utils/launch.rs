@@ -1,27 +1,33 @@
+use crate::utils::game_monitor::monitor_game;
 use serde::{Deserialize, Serialize};
 use std::path::Path;
 use std::process::Command;
-use tauri::command;
+use tauri::{command, AppHandle, Runtime};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct LaunchResult {
     success: bool,
     message: String,
+    process_id: Option<u32>, // 添加进程ID字段
 }
 
 /// 启动游戏
 ///
 /// # Arguments
 ///
+/// * `app_handle` - Tauri应用句柄
 /// * `game_path` - 游戏可执行文件的路径
+/// * `game_id` - 游戏ID (bgm_id 或 vndb_id)
 /// * `args` - 可选的游戏启动参数
 ///
 /// # Returns
 ///
-/// 启动结果，包含成功标志和消息
+/// 启动结果，包含成功标志、消息和进程ID
 #[command]
-pub async fn launch_game(
+pub async fn launch_game<R: Runtime>(
+    app_handle: AppHandle<R>,
     game_path: String,
+    game_id: String,
     args: Option<Vec<String>>,
 ) -> Result<LaunchResult, String> {
     // 获取游戏可执行文件的目录
@@ -45,14 +51,22 @@ pub async fn launch_game(
     }
 
     match command.spawn() {
-        Ok(_) => Ok(LaunchResult {
-            success: true,
-            message: format!(
-                "成功启动游戏: {}，工作目录: {:?}",
-                exe_name.to_string_lossy(),
-                game_dir
-            ),
-        }),
+        Ok(child) => {
+            let process_id = child.id();
+
+            // 启动游戏监控
+            monitor_game(app_handle, game_id, process_id).await;
+
+            Ok(LaunchResult {
+                success: true,
+                message: format!(
+                    "成功启动游戏: {}，工作目录: {:?}",
+                    exe_name.to_string_lossy(),
+                    game_dir
+                ),
+                process_id: Some(process_id),
+            })
+        }
         Err(e) => Err(format!("启动游戏失败: {}，目录: {:?}", e, game_dir)),
     }
 }

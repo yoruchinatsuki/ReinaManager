@@ -52,10 +52,7 @@ jobs:
 
       - name: Install dependencies
         run: pnpm install
-
-      - name: Build project
-        run: pnpm tauri build
-
+      
       - name: Get version
         id: get_version
         shell: bash
@@ -63,6 +60,11 @@ jobs:
           VERSION=$(node -p "require('./package.json').version")
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
           echo "Version is $VERSION"
+
+      - name: Build project
+        env:
+          GITHUB_ACTIONS: true
+        run: pnpm tauri build
 
       - name: Upload Executable
         uses: actions/upload-artifact@v4

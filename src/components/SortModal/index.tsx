@@ -59,7 +59,7 @@ const SortModal: React.FC = () => {
                 }}
             >
                 <DialogTitle>{t('components.SortModal.sort')}</DialogTitle>
-                <DialogContent sx={{ pt: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <DialogContent className="pt-2 flex flex-col gap-2">
                     <div>{t('components.SortModal.sortMethod')}</div>
                     <SortOption
                         value={localSortOption}
@@ -104,14 +104,14 @@ const UpDownSwitches = ({ value, onChange }: { value: string, onChange: (value: 
     };
 
     return (
-        <div style={{ display: 'flex', alignItems: 'center', marginTop: '10px' }}>
-            <span style={{ marginRight: '8px', opacity: isDesc ? 0.5 : 1 }}>{t('components.SortModal.ascending')}</span>
+        <div className="flex items-center mt-2.5">
+            <span className={`mr-2 ${isDesc ? 'opacity-50' : 'opacity-100'}`}>{t('components.SortModal.ascending')}</span>
             <Switch
                 checked={isDesc}
                 onChange={handleChange}
                 inputProps={{ 'aria-label': 'controlled' }}
             />
-            <span style={{ marginLeft: '8px', opacity: isDesc ? 1 : 0.5 }}>{t('components.SortModal.descending')}</span>
+            <span className={`ml-2 ${isDesc ? 'opacity-100' : 'opacity-50'}`}>{t('components.SortModal.descending')}</span>
         </div>
     );
 }

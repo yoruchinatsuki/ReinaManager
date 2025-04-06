@@ -67,7 +67,8 @@ const AddModal: React.FC = () => {
                 }, 5000);
                 return null;
             }
-            if (games.find((game) => getGamePlatformId(game) === getGamePlatformId(res) || game.name === res.name || game.name_cn === res.name_cn)) {
+            if (games.find((game) => getGamePlatformId(game) === getGamePlatformId(res) || (game.name === res.name || game.date === res.date))) {
+                console.log(res);
                 setError(t('components.AddModal.gameExists'));
                 setTimeout(() => {
                     setError('');

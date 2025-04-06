@@ -24,4 +24,38 @@ export interface HanleGamesProps  {
     canUse?: () => boolean;
 }
 
+// 游戏会话记录
+export interface GameSession {
+  id?: number;
+  game_ref_id: string;
+  id_type: 'bgm' | 'vndb';
+  start_time: number;
+  end_time?: number;
+  duration?: number; // 分钟
+  date: string;
+}
+
+// 游戏统计数据
+export interface GameStatistics {
+  game_ref_id: string;
+  id_type: 'bgm' | 'vndb';
+  total_time: number; // 分钟
+  session_count: number;
+  last_played?: number;
+  daily_stats?: Record<string, number>; // 格式: {YYYY-MM-DD: minutes}
+}
+
+// 格式化后的游戏时间统计
+export interface GameTimeStats {
+  totalPlayTime: string; // 格式化的总时间，如"10小时20分钟"
+  totalMinutes: number;  // 总分钟数
+  todayPlayTime: string; // 今天的游戏时间
+  todayMinutes: number;  // 今天的分钟数
+  sessionCount: number;  // 启动次数
+  lastPlayed: Date | null; // 最后一次游玩时间
+}
+
+// 回调函数类型
+export type TimeUpdateCallback = (gameId: string, minutes: number) => void;
+export type SessionEndCallback = (gameId: string, minutes: number) => void;
 

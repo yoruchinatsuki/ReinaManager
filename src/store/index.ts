@@ -22,6 +22,7 @@ import {
 import { getBgmTokenRepository, setBgmTokenRepository } from '@/utils/settingsConfig';
 import { isTauri } from '@tauri-apps/api/core';
 import { getGamePlatformId } from '@/utils';
+import { initializeGamePlayTracking } from './gamePlayStore';
 
 // 定义应用全局状态类型
 export interface AppState {
@@ -377,7 +378,12 @@ useIsLocalGame(gameId: string  ): boolean {
           get().fetchGames(),
           get().fetchBgmToken()
         ]);
+
+        // 初始化游戏时间跟踪
+      if (isTauri()) {
+        initializeGamePlayTracking();
       }
+    }
     }),
     {
       name: 'reina-manager-store',

@@ -11,6 +11,8 @@
     "sql:allow-execute",
     "core:path:default",
     "core:path:allow-dirname",
+    "core:event:default",
+    "core:event:allow-listen",
     "shell:allow-open",
     "fs:default",
     "fs:allow-copy-file",

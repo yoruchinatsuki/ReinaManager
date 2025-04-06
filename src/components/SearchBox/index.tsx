@@ -1,9 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import IconButton from '@mui/material/IconButton';
 import TextField from '@mui/material/TextField';
-import Tooltip from '@mui/material/Tooltip';
 import InputAdornment from '@mui/material/InputAdornment';
-import SearchIcon from '@mui/icons-material/Search';
 import ClearIcon from '@mui/icons-material/Clear';
 import { useStore } from '@/store';
 import { useTranslation } from 'react-i18next';
@@ -63,20 +61,6 @@ export const SearchBox = () => {
 
     return (
         <>
-            <Tooltip title={t('components.SearchBox.search')} enterDelay={1000}>
-                <div>
-                    <IconButton
-                        type="button"
-                        aria-label={t('components.SearchBox.search')}
-                        sx={{
-                            display: { xs: 'inline', md: 'none' },
-                        }}
-                        onClick={() => performSearch(keyword)}
-                    >
-                        <SearchIcon />
-                    </IconButton>
-                </div>
-            </Tooltip>
             <TextField
                 label={t('components.SearchBox.search')}
                 variant="outlined"
@@ -85,23 +69,24 @@ export const SearchBox = () => {
                 onChange={handleInputChange}
                 aria-label={t('components.SearchBox.searchGame')}
                 placeholder={t('components.SearchBox.inputGameName')}
-                InputProps={{
-                    endAdornment: (
-                        <InputAdornment position="end">
-                            {keyword && (
-                                <IconButton
-                                    onClick={handleClear}
-                                    edge="end"
-                                    size="small"
-                                    aria-label={t('components.SearchBox.clearSearch')}
-                                >
-                                    <ClearIcon fontSize="small" />
-                                </IconButton>
-                            )}
-                        </InputAdornment>
-                    ),
+                slotProps={{
+                    input: {
+                        endAdornment: (
+                            <InputAdornment position="end">
+                                {keyword && (
+                                    <IconButton
+                                        onClick={handleClear}
+                                        edge="end"
+                                        size="small"
+                                        aria-label={t('components.SearchBox.clearSearch')}
+                                    >
+                                        <ClearIcon fontSize="small" />
+                                    </IconButton>
+                                )}
+                            </InputAdornment>
+                        ),
+                    },
                 }}
-                sx={{ display: { xs: 'none', md: 'inline-block' }, mr: 1 }}
             />
         </>
     );

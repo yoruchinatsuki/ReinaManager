@@ -108,6 +108,13 @@ async function checkDatabaseStructure(db: Database): Promise<boolean> {
       ],
       'user': [
         'id', 'BGM_TOKEN'
+      ],
+      // 添加新表的列检查
+      'game_sessions': [
+        'id', 'game_ref_id', 'id_type', 'start_time', 'end_time', 'duration', 'date'
+      ],
+      'game_statistics': [
+        'game_ref_id', 'id_type', 'total_time', 'session_count', 'last_played', 'daily_stats'
       ]
     };
     
@@ -172,6 +179,33 @@ const createTable=async(db:Database)=>{
     CREATE TABLE IF NOT EXISTS user (
       id INTEGER PRIMARY KEY,
       BGM_TOKEN TEXT
+    );
+  `);
+
+  // 游戏会话表 - 记录每次游戏会话
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS game_sessions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      game_ref_id TEXT NOT NULL,
+      id_type TEXT NOT NULL,
+      start_time INTEGER NOT NULL,
+      end_time INTEGER NOT NULL,
+      duration INTEGER NOT NULL,
+      date TEXT NOT NULL,
+      created_at INTEGER DEFAULT (strftime('%s', 'now'))
+    );
+  `);
+  
+  // 游戏统计表 - 存储聚合数据
+  await db.execute(`
+    CREATE TABLE IF NOT EXISTS game_statistics (
+      game_ref_id TEXT NOT NULL,
+      id_type TEXT NOT NULL,
+      total_time INTEGER DEFAULT 0,
+      session_count INTEGER DEFAULT 0,
+      last_played INTEGER,
+      daily_stats TEXT DEFAULT '{}',
+      PRIMARY KEY (game_ref_id, id_type)
     );
   `);
 }

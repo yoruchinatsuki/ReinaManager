@@ -2,7 +2,7 @@ import { open } from '@tauri-apps/plugin-shell';
 import { invoke, isTauri } from '@tauri-apps/api/core';
 import {path} from '@tauri-apps/api';
 import type { GameData, HanleGamesProps } from '@/types';
-import { createTheme } from '@mui/material/styles';
+// import { createTheme } from '@mui/material/styles';
 
 
 export const time_now=()=>{
@@ -33,17 +33,17 @@ return currentDate;
 
 }
 
-export const Buttontheme = createTheme({
-  components: {
-    MuiButton: {
-      styleOverrides: {
-        root: {
-          textTransform: 'none', // 禁用所有按钮的文本大写转换
-        },
-      },
-    },
-  },
-});
+// export const Buttontheme = createTheme({
+//   components: {
+//     MuiButton: {
+//       styleOverrides: {
+//         root: {
+//           textTransform: 'none', // 禁用所有按钮的文本大写转换
+//         },
+//       },
+//     },
+//   },
+// });
 
 export async function openurl(url: string) {
   if (isTauri()) {
@@ -52,27 +52,6 @@ export async function openurl(url: string) {
     window.open(url, '_blank')
   }
 }
-
-export const handleStartGame = async ({id,getGameById}:HanleGamesProps) => {
-        try {
-          if (!id) {
-            console.error('未选择游戏');
-            return;
-        }
-          const selectedGame = await getGameById(id);
-            if (!selectedGame || !selectedGame.localpath) {
-                console.error('游戏路径未找到');
-                return;
-            }
-            // 调用Rust后端启动游戏
-            await invoke('launch_game', {
-                gamePath: selectedGame.localpath,
-            });
-        } catch (error) {
-            console.error('游戏启动失败:', error);
-            // 这里可以添加错误提示UI
-        }
-    }
 
     export const handleOpenFolder = async ({id,getGameById}:HanleGamesProps) => {
       if (!id) {

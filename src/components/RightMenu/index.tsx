@@ -6,10 +6,11 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router';
 import { useStore } from '@/store';
-import { handleStartGame, handleOpenFolder } from '@/utils';
+import { handleOpenFolder } from '@/utils';
 import { AlertDeleteBox } from '@/components/AlertBox';
 import { useTranslation } from 'react-i18next'; // 引入国际化hook
 import { isTauri } from '@tauri-apps/api/core';
+import { useGamePlayStore } from '@/store/gamePlayStore';
 
 interface RightMenuProps {
     isopen: boolean;
@@ -20,14 +21,17 @@ interface RightMenuProps {
 
 const RightMenu: React.FC<RightMenuProps> = ({ isopen, anchorPosition, setAnchorEl, id }) => {
     const { getGameById, deleteGame, useIsLocalGame } = useStore();
+    const { launchGame, isGameRunning } = useGamePlayStore();
     const [openAlert, setOpenAlert] = useState(false);
     const { t } = useTranslation(); // 使用翻译函数
 
+    // 检查这个特定游戏是否在运行
+    const isThisGameRunning = isGameRunning(id === null ? undefined : id);
 
     // 确定是否可以启动游戏
     const canUse = () => {
         if (id !== undefined && id !== null)
-            return isTauri() && useIsLocalGame(id);
+            return isTauri() && useIsLocalGame(id) && !isThisGameRunning;
     }
 
 
@@ -66,6 +70,23 @@ const RightMenu: React.FC<RightMenuProps> = ({ isopen, anchorPosition, setAnchor
         }
     };
 
+    const handleStartGame = async () => {
+        if (!id) return;
+
+        try {
+            const selectedGame = await getGameById(id);
+            if (!selectedGame || !selectedGame.localpath) {
+                console.error(t('components.LaunchModal.gamePathNotFound'));
+                return;
+            }
+
+            // 使用游戏启动函数
+            await launchGame(selectedGame.localpath, id);
+        } catch (error) {
+            console.error(t('components.LaunchModal.launchFailed'), error);
+        }
+    };
+
     return (
         <div
             className="fixed z-50 animate-fade-in animate-duration-200 select-none"
@@ -80,10 +101,8 @@ const RightMenu: React.FC<RightMenuProps> = ({ isopen, anchorPosition, setAnchor
                         : 'opacity-50 cursor-not-allowed'
                         }`}
                     onClick={() => {
-                        if (isTauri()) {
-                            handleStartGame({ id, getGameById });
-                            setAnchorEl(null);
-                        }
+                        handleStartGame();
+                        setAnchorEl(null);
                     }}
                 >
                     <PlayCircleOutlineIcon className="mr-2" />
@@ -106,15 +125,13 @@ const RightMenu: React.FC<RightMenuProps> = ({ isopen, anchorPosition, setAnchor
                 </div>
                 <div className="h-[1px] bg-gray-200 dark:bg-gray-700 my-1" />
                 <div
-                    className={`flex items-center px-4 py-2 text-black dark:text-white ${canUse()
+                    className={`flex items-center px-4 py-2 text-black dark:text-white ${isTauri()
                         ? 'hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer'
                         : 'opacity-50 cursor-not-allowed'
                         }`}
                     onClick={() => {
-                        if (isTauri()) {
-                            handleOpenFolder({ id, getGameById });
-                            setAnchorEl(null);
-                        }
+                        handleOpenFolder({ id, getGameById });
+                        setAnchorEl(null);
                     }}
                 >
                     <FolderOpenIcon className="mr-2" />

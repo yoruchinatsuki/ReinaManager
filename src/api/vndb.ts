@@ -17,7 +17,7 @@ export async function fetchFromVNDB(name: string, id?: string) {
     // 构建API请求体
     const requestBody = {
       filters: id ? ['id', '=', id] : ['search', '=', name],
-      fields: 'id, titles.title, titles.lang, titles.main, image.url, released, rating, tags.name,tags.rating, description,developers.name'
+      fields: 'id, titles.title, titles.lang, titles.main, image.url, released, rating, tags.name,tags.rating, description,developers.name,length_minutes'
     };
     
     // 调用VNDB API

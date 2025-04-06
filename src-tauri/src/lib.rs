@@ -1,6 +1,8 @@
 mod utils;
-use utils::launch::launch_game;
-use utils::launch::open_directory;
+use utils::{
+    game_monitor::monitor_game,
+    launch::{launch_game, open_directory},
+};
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -8,7 +10,11 @@ pub fn run() {
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_sql::Builder::new().build())
         .plugin(tauri_plugin_dialog::init())
-        .invoke_handler(tauri::generate_handler![launch_game, open_directory])
+        .invoke_handler(tauri::generate_handler![
+            launch_game,
+            open_directory,
+            monitor_game,
+        ])
         .setup(|app| {
             if cfg!(debug_assertions) {
                 app.handle().plugin(
