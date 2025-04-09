@@ -3,7 +3,7 @@ import { useGamePlayStore } from '@/store/gamePlayStore';
 import { PageContainer } from '@toolpad/core';
 import { useLocation } from 'react-router';
 import type { GameData } from '@/types';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Typography, Box, Stack, Chip, Paper } from '@mui/material';
 import SportsEsportsIcon from '@mui/icons-material/SportsEsports';
@@ -13,6 +13,14 @@ import BackupIcon from '@mui/icons-material/Backup';
 import { CircularProgress } from '@mui/material';
 import type { GameTimeStats } from '@/types';
 import { getGamePlatformId } from '@/utils';
+import { LineChart } from '@mui/x-charts/LineChart';
+
+// 图表数据类型定义
+interface GameTimeChartData {
+    date: string;
+    playtime: number;
+    [key: string]: string | number;
+}
 
 interface InfoBoxProps {
     game: GameData;
@@ -102,51 +110,110 @@ const InfoBox: React.FC<InfoBoxProps> = ({ game }) => {
         }
     ];
 
-    return (
-        <Box className="mt-16 mb-12">
-            <Typography variant="h6" fontWeight="bold" gutterBottom>
-                {t('pages.Detail.gameStats')}
-            </Typography>
+    // 生成过去7天的补全数据
+    const chartData = useMemo(() => {
+        if (!stats?.daily_stats) return [] as GameTimeChartData[];
 
-            <div className="grid grid-cols-4 gap-4">
-                {loading ? (
-                    <div className="flex justify-center w-full py-4 col-span-full">
-                        <CircularProgress size={24} />
-                    </div>
-                ) : (
-                    statItems.map((item) => {
-                        return (
-                            <Paper
-                                key={item.title}
-                                elevation={0}
-                                className={`
+        // 创建一个日期到游戏时间的映射
+        const datePlaytimeMap = new Map<string, number>();
+        for (const item of stats.daily_stats) {
+            datePlaytimeMap.set(item.date, item.playtime);
+        }
+
+        // 生成过去7天的日期数组，包括今天
+        const result: GameTimeChartData[] = [];
+
+        // 获取当前日期，使用本地时间而非UTC
+        const now = new Date();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+        // 从6天前到今天（总共7天）
+        for (let i = 6; i >= 0; i--) {
+            const date = new Date(today);
+            date.setDate(today.getDate() - i);
+
+            // 使用本地日期格式化，避免时区转换问题
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const dateStr = `${year}-${month}-${day}`;
+
+            // 如果这一天有数据则使用数据，否则设为0
+            result.push({
+                date: dateStr,
+                playtime: datePlaytimeMap.get(dateStr) || 0
+            });
+        }
+
+        return result;
+    }, [stats?.daily_stats]);
+    return (
+        <>
+            <Box className="mt-16 mb-12">
+                <Typography variant="h6" fontWeight="bold" gutterBottom>
+                    {t('pages.Detail.gameStats')}
+                </Typography>
+
+                <div className="grid grid-cols-4 gap-4">
+                    {loading ? (
+                        <div className="flex justify-center w-full py-4 col-span-full">
+                            <CircularProgress size={24} />
+                        </div>
+                    ) : (
+                        statItems.map((item) => {
+                            return (
+                                <Paper
+                                    key={item.title}
+                                    elevation={0}
+                                    className={`
                                 p-4 rounded-lg overflow-hidden
                                 transition-all duration-200
                                 hover:shadow-md hover:scale-[1.02]
                                 ${item.color === 'primary' ? 'bg-blue-50/40 border border-blue-100/40' : 'bg-green-50/40 border border-green-100/40'}
                             `}
-                            >
-                                <div className="flex items-center space-x-2 mb-2">
-                                    <span className="text-[#1976d2] flex-shrink-0 flex items-center">
-                                        {item.icon}
-                                    </span>
-                                    <Typography
-                                        variant="body2"
-                                        className="font-medium text-gray-600 truncate"
-                                        title={item.title}
-                                    >
-                                        {item.title}
+                                >
+                                    <div className="flex items-center space-x-2 mb-2">
+                                        <span className="text-[#1976d2] flex-shrink-0 flex items-center">
+                                            {item.icon}
+                                        </span>
+                                        <Typography
+                                            variant="body2"
+                                            className="font-medium text-gray-600 truncate"
+                                            title={item.title}
+                                        >
+                                            {item.title}
+                                        </Typography>
+                                    </div>
+                                    <Typography variant="h6" className="font-bold">
+                                        {item.value}
                                     </Typography>
-                                </div>
-                                <Typography variant="h6" className="font-bold">
-                                    {item.value}
-                                </Typography>
-                            </Paper>
-                        );
-                    })
-                )}
-            </div>
-        </Box>
+                                </Paper>
+                            );
+                        })
+                    )}
+                </div>
+            </Box>
+            {
+                chartData.length > 0 &&
+                <LineChart
+                    dataset={chartData}
+                    xAxis={[{
+                        dataKey: 'date',
+                        scaleType: 'point'
+                    }]}
+                    yAxis={[{
+                        min: 0,
+                        max: Math.max(...chartData.map(item => item.playtime)) + 5,
+                        label: t('pages.Detail.playTimeMinutes', '游戏时长(分钟)'),
+                        // 确保绘图区域从0开始
+                        scaleType: 'linear'
+                    }]}
+                    series={[{ dataKey: 'playtime', color: '#1976d2' }]}
+                    height={300}
+                    grid={{ vertical: true, horizontal: true }}
+                />
+            }
+        </>
     );
 };
 
@@ -254,6 +321,7 @@ export const Detail: React.FC = () => {
                     <Typography variant="h6" fontWeight="bold">{t('pages.Detail.introduction')}</Typography>
                     <Typography className="mt-1">{game.summary}</Typography>
                 </Box>
+
             </Box>
         </PageContainer>
     )

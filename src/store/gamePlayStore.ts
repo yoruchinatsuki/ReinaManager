@@ -2,12 +2,12 @@ import { create } from 'zustand';
 import { isTauri } from '@tauri-apps/api/core';
 import { 
   getFormattedGameStats, 
-  getGameTimeTrend, 
   getGameSessions,
   launchGameWithTracking,
   initGameTimeTracking,
 } from '@/utils/gameStats';
 import type { GameSession, GameTimeStats } from '@/types';
+
 
 interface LaunchGameResult {
   success: boolean;
@@ -24,25 +24,19 @@ interface GameRealTimeState {
   processId?: number;
 }
 
-// 图表数据类型定义
-interface GameTimeChartData {
-  date: string;
-  minutes: number;
-}
-
 interface GamePlayState {
   runningGameIds: Set<string>;
   isTrackingInitialized: boolean;
   gameTimeStats: Record<string, GameTimeStats>;
   recentSessions: Record<string, GameSession[]>;
-  trendData: Record<string, GameTimeChartData[]>;
+  // trendData: Record<string, GameTimeChartData[]>;
   gameRealTimeStates: Record<string, GameRealTimeState>;
   
   // 方法
   isGameRunning: (gameId?: string) => boolean;
   launchGame: (gamePath: string, gameId: string, args?: string[]) => Promise<LaunchGameResult>;
   loadGameStats: (gameId: string, forceRefresh?: boolean) => Promise<GameTimeStats | null>;
-  loadGameTrend: (gameId: string, days?: number) => Promise<GameTimeChartData[] | null>;
+  // loadGameTrend: (gameId: string, days?: number) => Promise<GameTimeChartData[] | null>;
   loadRecentSessions: (gameId: string, limit?: number) => Promise<GameSession[] | null>;
   initTimeTracking: () => void;
   clearActiveGame: () => void;
@@ -184,31 +178,31 @@ export const useGamePlayStore = create<GamePlayState>((set, get) => ({
     }
   },
   
-  loadGameTrend: async (gameId: string, days = 7): Promise<GameTimeChartData[] | null> => {
-    try {
-      if (!isTauri()) return null;
+  // loadGameTrend: async (gameId: string, days = 7): Promise<GameTimeChartData[] | null> => {
+  //   try {
+  //     if (!isTauri()) return null;
       
-      // 检查缓存
-      const cached = get().trendData[gameId];
-      if (cached) return cached;
+  //     // 检查缓存
+  //     const cached = get().trendData[gameId];
+  //     if (cached) return cached;
       
-      // 获取新数据
-      const trend = await getGameTimeTrend(gameId, days);
+  //     // 获取新数据
+  //     const trend = await getGameTimeTrend(gameId, days);
       
-      // 更新状态
-      set(state => ({
-        trendData: {
-          ...state.trendData,
-          [gameId]: trend
-        }
-      }));
+  //     // 更新状态
+  //     set(state => ({
+  //       trendData: {
+  //         ...state.trendData,
+  //         [gameId]: trend
+  //       }
+  //     }));
       
-      return trend;
-    } catch (error) {
-      console.error('加载游戏时间趋势数据失败:', error);
-      return null;
-    }
-  },
+  //     return trend;
+  //   } catch (error) {
+  //     console.error('加载游戏时间趋势数据失败:', error);
+  //     return null;
+  //   }
+  // },
   
   loadRecentSessions: async (gameId: string, limit = 5): Promise<GameSession[] | null> => {
     try {

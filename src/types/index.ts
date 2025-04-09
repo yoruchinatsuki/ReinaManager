@@ -42,7 +42,7 @@ export interface GameStatistics {
   total_time: number; // 分钟
   session_count: number;
   last_played?: number;
-  daily_stats?: Record<string, number>; // 格式: {YYYY-MM-DD: minutes}
+  daily_stats?: Array<{date: string; playtime: number}>; // 新格式: [{date: "YYYY-MM-DD", playtime: minutes}, ...]
 }
 
 // 格式化后的游戏时间统计
@@ -53,6 +53,7 @@ export interface GameTimeStats {
   todayMinutes: number;  // 今天的分钟数
   sessionCount: number;  // 启动次数
   lastPlayed: Date | null; // 最后一次游玩时间
+  daily_stats?: Array<{date: string; playtime: number}>; // 新格式: [{date: "YYYY-MM-DD", playtime: minutes}, ...]
 }
 
 // 回调函数类型
