@@ -10,6 +10,7 @@ import { createHashRouter, type RouteObject } from 'react-router';
 import React from 'react';
 import Layout from '@/components/Layout';
 import App from '@/App';
+import { Edit } from '@/pages/Edit';
 
 export interface RouteConfig {
     title: string;
@@ -46,6 +47,16 @@ export const routes: RouteGroup[] = [
                     { title: 'default', index: true, component: Card },
                     { title: 'detail', path: ':id', component: Detail },
                 ]
+            },
+            {
+                title: 'edit',
+                path: 'edit',
+                component: Edit,
+                children: [
+                    { title: 'default', index: true, component: Edit },
+                    { title: 'detail', path: ':id', component: Edit },
+                ]
+
             },
             {
                 title: 'settings',

@@ -81,3 +81,16 @@ export function getGamePlatformId(game: GameData): string | undefined {
   return undefined;
 }
 
+// 改进版本，使用更清晰的函数设计
+export function isCustom(gameOrId: GameData | string | undefined): boolean {
+  if (!gameOrId) return false;
+  
+  // 如果传入的是游戏对象
+  if (typeof gameOrId !== 'string') {
+    return Boolean(gameOrId.bgm_id?.includes("custom"));
+  }
+  
+  // 如果传入的是字符串ID
+  return gameOrId.includes("custom");
+}
+

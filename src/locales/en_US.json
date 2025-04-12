@@ -31,7 +31,8 @@
             "todayPlayTime": "Today's Play Time",
             "backupCount": "Save Backup Count",
             "gameDatafrom": "Data Source",
-            "expected_hours": "Expected Hours"
+            "expected_hours": "Expected Hours",
+            "playTimeMinutes": "Play Time (Minutes)"
         }
     },
     "components": {
@@ -44,7 +45,10 @@
         "Toolbar": {
             "gameLibrary": "Game Library",
             "openGameFolder": "Open Game Folder",
-            "deleteGame": "Delete Game"
+            "deleteGame": "Delete Game",
+            "bgmlink": "View Bangumi Page",
+            "vndblink": "View Vndb Page",
+            "editModal": "Edit Game"
         },
         "LaunchModal": {
             "launchGame": "Launch Game",

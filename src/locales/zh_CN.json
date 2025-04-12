@@ -31,7 +31,8 @@
             "todayPlayTime": "今日游戏时长",
             "backupCount": "存档备份数",
             "gameDatafrom": "数据来源",
-            "expected_hours":"预计时长"
+            "expected_hours":"预计时长",
+            "playTimeMinutes":"游戏时长(分钟)"
         }
     },
     "components": {
@@ -44,7 +45,10 @@
         "Toolbar": {
             "gameLibrary": "游戏仓库",
             "openGameFolder": "打开游戏目录",
-            "deleteGame": "删除游戏"
+            "deleteGame": "删除游戏",
+            "bgmlink": "查看Bangumi页面",
+            "vndblink": "查看Vndb页面",
+            "editModal": "编辑游戏"
         },
         "LaunchModal": {
             "launchGame": "启动游戏",

@@ -31,7 +31,8 @@
             "todayPlayTime": "今日のプレイ時間",
             "backupCount": "セーブバックアップ数",
             "gameDatafrom": "データソース",
-            "expected_hours": "予想プレイ時間"
+            "expected_hours": "予想プレイ時間",
+            "playTimeMinutes": "プレイ時間（分）"
         }
     },
     "components": {
@@ -44,7 +45,10 @@
         "Toolbar": {
             "gameLibrary": "ゲームライブラリ",
             "openGameFolder": "ゲームフォルダを開く",
-            "deleteGame": "ゲームを削除"
+            "deleteGame": "ゲームを削除",
+            "bgmlink": "Bangumiページを見る",
+            "vndblink": "Vndbページを見る",
+            "editModal": "ゲームを編集"
         },
         "LaunchModal": {
             "launchGame": "ゲームを起動",

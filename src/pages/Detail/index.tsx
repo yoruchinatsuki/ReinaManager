@@ -12,7 +12,7 @@ import TodayIcon from '@mui/icons-material/Today';
 import BackupIcon from '@mui/icons-material/Backup';
 import { CircularProgress } from '@mui/material';
 import type { GameTimeStats } from '@/types';
-import { getGamePlatformId } from '@/utils';
+import { getGamePlatformId, isCustom } from '@/utils';
 import { LineChart } from '@mui/x-charts/LineChart';
 
 // 图表数据类型定义
@@ -112,12 +112,14 @@ const InfoBox: React.FC<InfoBoxProps> = ({ game }) => {
 
     // 生成过去7天的补全数据
     const chartData = useMemo(() => {
-        if (!stats?.daily_stats) return [] as GameTimeChartData[];
-
         // 创建一个日期到游戏时间的映射
         const datePlaytimeMap = new Map<string, number>();
-        for (const item of stats.daily_stats) {
-            datePlaytimeMap.set(item.date, item.playtime);
+
+        // 只有当存在daily_stats时才填充数据
+        if (stats?.daily_stats) {
+            for (const item of stats.daily_stats) {
+                datePlaytimeMap.set(item.date, item.playtime);
+            }
         }
 
         // 生成过去7天的日期数组，包括今天
@@ -147,6 +149,7 @@ const InfoBox: React.FC<InfoBoxProps> = ({ game }) => {
 
         return result;
     }, [stats?.daily_stats]);
+
     return (
         <>
             <Box className="mt-16 mb-12">
@@ -204,7 +207,7 @@ const InfoBox: React.FC<InfoBoxProps> = ({ game }) => {
                     yAxis={[{
                         min: 0,
                         max: Math.max(...chartData.map(item => item.playtime)) + 5,
-                        label: t('pages.Detail.playTimeMinutes', '游戏时长(分钟)'),
+                        label: t('pages.Detail.playTimeMinutes'),
                         // 确保绘图区域从0开始
                         scaleType: 'linear'
                     }]}
@@ -264,7 +267,11 @@ export const Detail: React.FC = () => {
                             direction={{ xs: 'column', sm: 'row' }}
                             className="flex flex-wrap [&>div]:mr-6 [&>div]:mb-2"
                         >
-                            {game.image !== "/images/default.png" &&
+                            {isCustom(id) ?
+                                <Box>
+                                    <Typography variant="subtitle2" fontWeight="bold">{t('pages.Detail.gameDatafrom')}</Typography>
+                                    <Typography>custom</Typography>
+                                </Box> :
                                 <Box>
                                     <Typography variant="subtitle2" fontWeight="bold">{t('pages.Detail.gameDatafrom')}</Typography>
                                     <Typography>{game.bgm_id ? "Bangumi" : "Vndb"}</Typography>
