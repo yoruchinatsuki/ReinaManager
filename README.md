@@ -44,7 +44,7 @@ The `Reina` in the name is the character <a href="https://vndb.org/c64303"><b>å¦
 - [x] Count the time spent playing
 - [ ] Beautify individual pages
 - [x] Design the detail page
-- [ ] Refactor database queries
+- [x] Refactor database queries
 - [ ] Add mixed api to search games
 - [ ] Edit page functions
 

@@ -48,6 +48,7 @@ export async function fetchFromVNDB(name: string, id?: string) {
     return {
       bgm_id: null,
       vndb_id: VNDBdata.id,
+      id_type: 'vndb',
       date: VNDBdata.released,
       image: VNDBdata.image?.url||null ,
       summary: VNDBdata.description,

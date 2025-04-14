@@ -48,7 +48,8 @@
             "deleteGame": "刪除遊戲",
             "bgmlink": "查看Bangumi頁面",
             "vndblink": "查看Vndb頁面",
-            "editModal": "編輯遊戲"
+            "editModal": "編輯遊戲",
+            "more": "更多"
         },
         "LaunchModal": {
             "launchGame": "啟動遊戲",
@@ -76,9 +77,11 @@
         },
         "AlertBox": {
             "cancel": "取消",
+            "confirm": "確認",
             "confirmDelete": "確認刪除",
-            "deleteGameTitle": "是否刪除遊戲？",
-            "deleteGameMessage": "此操作無法撤銷，確定要刪除該遊戲嗎？"
+            "deleteGameTitle": "刪除遊戲",
+            "deleteGameMessage": "確定要刪除這個遊戲嗎？此操作不可撤銷。",
+            "processing": "處理中..."
         },
         "AddModal": {
             "addGame": "添加遊戲",

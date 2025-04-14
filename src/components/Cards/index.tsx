@@ -4,7 +4,6 @@ import CardMedia from '@mui/material/CardMedia';
 import CardActionArea from '@mui/material/CardActionArea';
 import RightMenu from '@/components/RightMenu';
 import { useStore } from '@/store';
-import { getGamePlatformId } from '@/utils';
 
 const Cards = () => {
     const { selectedGameId, setSelectedGameId } = useStore();
@@ -12,12 +11,12 @@ const Cards = () => {
     const [menuPosition, setMenuPosition] = useState<{
         mouseX: number;
         mouseY: number;
-        cardId: string | null;
+        cardId: number | null;
     } | null>(null);
 
     const { games } = useStore();
 
-    const handleContextMenu = (event: React.MouseEvent, cardId: string | undefined) => {
+    const handleContextMenu = (event: React.MouseEvent, cardId: number | undefined) => {
         if (!cardId) return;
         setMenuPosition({
             mouseX: event.clientX,
@@ -39,15 +38,15 @@ const Cards = () => {
                     if (!value) setMenuPosition(null);
                 }} />
             {games.map((card) => {
-                const isActive = selectedGameId === getGamePlatformId(card); // 判断当前卡片是否被选中
+                const isActive = selectedGameId === card.id; // 判断当前卡片是否被选中
                 return (
                     <Card
-                        key={getGamePlatformId(card)}
+                        key={card.id}
                         className={`min-w-24 max-w-full ${isActive ? 'scale-y-105' : ''}`}
-                        onContextMenu={(e) => handleContextMenu(e, getGamePlatformId(card))}
+                        onContextMenu={(e) => handleContextMenu(e, card.id)}
                     >
                         <CardActionArea
-                            onClick={() => setSelectedGameId(getGamePlatformId(card))}
+                            onClick={() => setSelectedGameId(card.id)}
                             className={`
                              duration-100 
                             hover:shadow-lg hover:scale-105 

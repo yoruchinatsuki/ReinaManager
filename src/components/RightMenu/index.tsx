@@ -16,13 +16,14 @@ interface RightMenuProps {
     isopen: boolean;
     anchorPosition?: { top: number; left: number };
     setAnchorEl: (value: null) => void;
-    id: string | null | undefined;
+    id: number | null | undefined;
 }
 
 const RightMenu: React.FC<RightMenuProps> = ({ isopen, anchorPosition, setAnchorEl, id }) => {
     const { getGameById, deleteGame, useIsLocalGame } = useStore();
     const { launchGame, isGameRunning } = useGamePlayStore();
     const [openAlert, setOpenAlert] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
     const { t } = useTranslation(); // 使用翻译函数
 
     // 检查这个特定游戏是否在运行
@@ -62,13 +63,22 @@ const RightMenu: React.FC<RightMenuProps> = ({ isopen, anchorPosition, setAnchor
         left: anchorPosition?.left ?? 0,
     };
 
-    // 定义删除游戏的处理函数
-    const handleDeleteGame = () => {
-        if (id) {
-            deleteGame(id);
-            setAnchorEl(null);
+    const handleDeleteGame = async () => {
+        if (!id) return;
+
+        try {
+            setIsDeleting(true);
+            setAnchorEl(null); // 关闭菜单
+            await deleteGame(id);
+        } catch (error) {
+            console.error('删除游戏失败:', error);
+            // 可以添加错误提示
+        } finally {
+            setAnchorEl(null); // 关闭菜单
+            setIsDeleting(false);
+            setOpenAlert(false);
         }
-    };
+    }
 
     const handleStartGame = async () => {
         if (!id) return;
@@ -93,7 +103,7 @@ const RightMenu: React.FC<RightMenuProps> = ({ isopen, anchorPosition, setAnchor
             style={menuStyle}
             onClick={(e) => e.stopPropagation()}
         >
-            <AlertDeleteBox open={openAlert} setOpen={setOpenAlert} onConfirm={handleDeleteGame} />
+            <AlertDeleteBox open={openAlert} setOpen={setOpenAlert} onConfirm={handleDeleteGame} isLoading={isDeleting} />
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg min-w-[200px] py-1 border border-gray-200 dark:border-gray-700">
                 <div
                     className={`flex items-center px-4 py-2 text-black dark:text-white ${canUse()

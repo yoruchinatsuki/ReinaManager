@@ -49,7 +49,7 @@ const AddModal: React.FC = () => {
             return;
         }
         if (customMode) {
-            await addGame({ bgm_id: `custom_${String(time_now().getTime())}`, localpath: path, name: formText, name_cn: '', image: "/images/default.png", time: time_now() });
+            await addGame({ id_type: 'custom', localpath: path, name: formText, name_cn: '', image: "/images/default.png", time: time_now() });
             setFormText('');
             setPath('');
             handleClose();

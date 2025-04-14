@@ -51,39 +51,18 @@ function processGameRows(rows: GameData[]): GameData[] {
   }));
 }
 
-export function getIdType(gameId: string): {
-  whereClause: string;
-  params: string[];
-  type: 'vndb' | 'bgm' | 'unknown';
-} {
-  // 判断ID类型
-  if (gameId.startsWith('v')) {
-    // vndb格式ID
-    return {
-      whereClause: 'vndb_id = ?',
-      params: [gameId],
-      type: 'vndb'
-    };
-  }  
-    // 假设是bgm格式ID
-    return {
-      whereClause: 'bgm_id = ?',
-      params: [gameId],
-      type: 'bgm'
-    };
-  }
-
 // 插入游戏数据，将 tags 序列化存储
 export async function insertGame(game: GameData) {
   const db = await getDb();
   await db.execute(
     `
-    INSERT INTO games (bgm_id,vndb_id, date, image, summary, name, name_cn, tags, rank, score, time, localpath,developer,all_titles,aveage_hours)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?);
+    INSERT INTO games (bgm_id,vndb_id,id_type, date, image, summary, name, name_cn, tags, rank, score, time, localpath,developer,all_titles,aveage_hours)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?);
     `,
     [
       game.bgm_id,
       game.vndb_id,
+      game.id_type,
       game.date,
       game.image,
       game.summary,
@@ -120,30 +99,52 @@ export async function getGames(sortOption = 'addtime', sortOrder: 'asc' | 'desc'
   return processGameRows(rows);
 }
 
-// 按 game_id 文本标识查找游戏数据
-export async function getGameByGameId(gameId: string): Promise<GameData> {
+// // 通过外部ID(bgm_id或vndb_id)查找内部ID
+// export async function getInternalIdByExternalId(externalId: string): Promise<number | null> {
+//   const db = await getDb();
+//   let query: string;
+//   let params: string[];
+  
+//   if (externalId.startsWith('v')) {
+//     // vndb格式ID
+//     query = "SELECT id FROM games WHERE vndb_id = ? LIMIT 1";
+//     params = [externalId];
+//   } else {
+//     // 假设是bgm格式ID
+//     query = "SELECT id FROM games WHERE bgm_id = ? LIMIT 1";
+//     params = [externalId];
+//   }
+  
+//   const result = await db.select<{id: number}[]>(query, params);
+//   return result.length > 0 ? result[0].id : null;
+// }
+
+// 通过内部ID获取游戏数据
+export async function getGameById(id: number): Promise<GameData | null> {
   const db = await getDb();
+  const rows = await db.select<GameData[]>(`
+    SELECT * FROM games WHERE id = ? LIMIT 1;
+  `, [id]);
   
-  // 使用工具函数构建查询
-  const { whereClause, params } = getIdType(gameId);
-  
-  const query = `
-    SELECT * FROM games 
-    WHERE ${whereClause}
-    LIMIT 1;
-  `;
-  
-  const rows = await db.select<GameData[]>(query, params);
+  if (rows.length === 0) return null;
   return processGameRows(rows)[0];
 }
 
-// 删除游戏记录
-export async function deleteGame(gameId: string) {
-  const db = await getDb();
-  const { whereClause, params } = getIdType(gameId);
+// // 按 game_id 文本标识查找游戏数据 - 修改为使用内部ID
+// export async function getGameByGameId(gameId: string): Promise<GameData | null> {
+//   const internalId = await getInternalIdByExternalId(gameId);
+//   if (internalId === null) return null;
+//   return getGameById(internalId);
+// }
 
-  // 正确: 直接使用完整的where子句和参数
-  await db.execute(`DELETE FROM games WHERE ${whereClause};`, params);
+// 删除游戏记录 
+export async function deleteGame(gameId: number) {
+  const db = await getDb();
+  // 删除相关的会话记录和统计数据
+  await db.execute("DELETE FROM game_sessions WHERE game_id = ?", [gameId]);
+  await db.execute("DELETE FROM game_statistics WHERE game_id = ?", [gameId]);  
+  //删除游戏数据
+  await db.execute("DELETE FROM games WHERE id = ?", [gameId]);
 }
 
 // 更新搜索游戏函数，添加类型筛选功能

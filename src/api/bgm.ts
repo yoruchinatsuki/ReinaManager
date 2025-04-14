@@ -20,14 +20,13 @@ export async function fetchFromBgm(name: string, BGM_TOKEN: string,id?: string) 
         "Authorization": `Bearer ${BGM_TOKEN}`,
     }
 }
-    if (BGM_TOKEN==='')return "请先设置BGM Token";
     let idTemp=id;
     if(!id){
         const dataTemp = (await http.get(`https://api.bgm.tv/search/subject/${name}?type=4&responseGroup=small`)).data;
     if (!dataTemp||dataTemp.length===0)return "未找到相关条目，请确认游戏名字后重试";
     idTemp = dataTemp.list[0].id
     }
-    const BGMdata = (await http.get(`https://api.bgm.tv/v0/subjects/${idTemp}`, BGM_HEADER)).data;
+    const BGMdata = (await http.get(`https://api.bgm.tv/v0/subjects/${idTemp}`, BGM_TOKEN !== '' ? BGM_HEADER : undefined)).data;
 
     return {
         date: BGMdata.date,
@@ -42,6 +41,7 @@ export async function fetchFromBgm(name: string, BGM_TOKEN: string,id?: string) 
         score: BGMdata.rating.score,
         bgm_id:String(BGMdata.id),
         vndb_id: null,
+        id_type: 'bgm',
         time:time_now(),
         developer:BGMdata.infobox.find((k: { key: string }) => k.key === '开发')?.value ?? '',
     }

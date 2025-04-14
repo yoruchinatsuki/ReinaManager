@@ -27,7 +27,7 @@ pub struct LaunchResult {
 pub async fn launch_game<R: Runtime>(
     app_handle: AppHandle<R>,
     game_path: String,
-    game_id: String,
+    game_id: u32,
     args: Option<Vec<String>>,
 ) -> Result<LaunchResult, String> {
     // 获取游戏可执行文件的目录

@@ -25,7 +25,7 @@ interface GameRealTimeState {
 }
 
 interface GamePlayState {
-  runningGameIds: Set<string>;
+  runningGameIds: Set<number>;
   isTrackingInitialized: boolean;
   gameTimeStats: Record<string, GameTimeStats>;
   recentSessions: Record<string, GameSession[]>;
@@ -33,36 +33,35 @@ interface GamePlayState {
   gameRealTimeStates: Record<string, GameRealTimeState>;
   
   // 方法
-  isGameRunning: (gameId?: string) => boolean;
-  launchGame: (gamePath: string, gameId: string, args?: string[]) => Promise<LaunchGameResult>;
-  loadGameStats: (gameId: string, forceRefresh?: boolean) => Promise<GameTimeStats | null>;
-  // loadGameTrend: (gameId: string, days?: number) => Promise<GameTimeChartData[] | null>;
-  loadRecentSessions: (gameId: string, limit?: number) => Promise<GameSession[] | null>;
+  isGameRunning: (gameId?: number) => boolean;
+  launchGame: (gamePath: string, gameId: number, args?: string[]) => Promise<LaunchGameResult>;
+  loadGameStats: (gameId: number, forceRefresh?: boolean) => Promise<GameTimeStats | null>;
+  loadRecentSessions: (gameId: number, limit?: number) => Promise<GameSession[] | null>;
   initTimeTracking: () => void;
   clearActiveGame: () => void;
-  getGameRealTimeState: (gameId: string) => GameRealTimeState | null;
+  getGameRealTimeState: (gameId: number) => GameRealTimeState | null;
 }
 
 export const useGamePlayStore = create<GamePlayState>((set, get) => ({
-  runningGameIds: new Set<string>(),
+  runningGameIds: new Set<number>(),
   isTrackingInitialized: false,
   gameTimeStats: {},
   recentSessions: {},
   trendData: {},
   gameRealTimeStates: {},
   
-  isGameRunning: (gameId?: string) => {
+  isGameRunning: (gameId?: number) => {
     const runningGames = get().runningGameIds;
     if (!gameId) return runningGames.size > 0;
     return runningGames.has(gameId);
   },
   
-  getGameRealTimeState: (gameId: string) => {
+  getGameRealTimeState: (gameId: number) => {
     const state = get().gameRealTimeStates[gameId];
     return state || null;
   },
   
-  launchGame: async (gamePath: string, gameId: string, args?: string[]): Promise<LaunchGameResult> => {
+  launchGame: async (gamePath: string, gameId: number, args?: string[]): Promise<LaunchGameResult> => {
     if (!isTauri()) {
       return { success: false, message: '游戏启动功能仅在桌面应用中可用' };
     }
@@ -150,7 +149,7 @@ export const useGamePlayStore = create<GamePlayState>((set, get) => ({
     }
   },
   
-  loadGameStats: async (gameId: string, forceRefresh = false): Promise<GameTimeStats | null> => {
+  loadGameStats: async (gameId: number, forceRefresh = false): Promise<GameTimeStats | null> => {
     try {
       if (!isTauri()) return null;
       
@@ -204,7 +203,7 @@ export const useGamePlayStore = create<GamePlayState>((set, get) => ({
   //   }
   // },
   
-  loadRecentSessions: async (gameId: string, limit = 5): Promise<GameSession[] | null> => {
+  loadRecentSessions: async (gameId: number, limit = 5): Promise<GameSession[] | null> => {
     try {
       if (!isTauri()) return null;
       
@@ -233,7 +232,7 @@ export const useGamePlayStore = create<GamePlayState>((set, get) => ({
       // 设置事件监听
       const cleanup = initGameTimeTracking(
         // 时间更新回调
-        (gameId: string, minutes: number) => {
+        (gameId: number, minutes: number) => {
           // 更新实时游戏状态
           set(state => {
             if (!state.gameRealTimeStates[gameId]) return state;
@@ -255,7 +254,7 @@ export const useGamePlayStore = create<GamePlayState>((set, get) => ({
           });
         },
         // 会话结束回调
-        async (gameId: string, _minutes: number) => {
+        async (gameId: number, _minutes: number) => {
           // 只清除运行状态
           set(state => {
             const newRunningGames = new Set(state.runningGameIds);
@@ -287,7 +286,7 @@ export const useGamePlayStore = create<GamePlayState>((set, get) => ({
   
   clearActiveGame: () => {
     set({ 
-      runningGameIds: new Set<string>(),
+      runningGameIds: new Set<number>(),
       gameRealTimeStates: {} 
     });
   }

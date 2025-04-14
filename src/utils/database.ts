@@ -102,7 +102,7 @@ async function checkDatabaseStructure(db: Database): Promise<boolean> {
     // 定义预期表结构
     const requiredColumns = {
       'games': [
-        'id', 'bgm_id', 'vndb_id', 'date', 'image', 'summary', 'name', 
+        'id', 'bgm_id', 'vndb_id','id_type', 'date', 'image', 'summary', 'name', 
         'name_cn', 'tags', 'rank', 'score', 'time', 'localpath', 
         'developer', 'all_titles', 'aveage_hours'
       ],
@@ -111,10 +111,10 @@ async function checkDatabaseStructure(db: Database): Promise<boolean> {
       ],
       // 添加新表的列检查
       'game_sessions': [
-        'id', 'game_ref_id', 'id_type', 'start_time', 'end_time', 'duration', 'date'
+        'session_id', 'game_id', 'start_time', 'end_time', 'duration', 'date'
       ],
       'game_statistics': [
-        'game_ref_id', 'id_type', 'total_time', 'session_count', 'last_played', 'daily_stats'
+        'game_id',  'total_time', 'session_count', 'last_played', 'daily_stats'
       ]
     };
     
@@ -158,6 +158,7 @@ const createTable=async(db:Database)=>{
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       bgm_id TEXT,
       vndb_id TEXT,
+      id_type TEXT NOT NULL,
       date TEXT,
       image TEXT,
       summary TEXT,
@@ -185,27 +186,26 @@ const createTable=async(db:Database)=>{
   // 游戏会话表 - 记录每次游戏会话
   await db.execute(`
     CREATE TABLE IF NOT EXISTS game_sessions (
-      id INTEGER PRIMARY KEY AUTOINCREMENT,
-      game_ref_id TEXT NOT NULL,
-      id_type TEXT NOT NULL,
+      session_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      game_id INTEGER NOT NULL,
       start_time INTEGER NOT NULL,
       end_time INTEGER NOT NULL,
       duration INTEGER NOT NULL,
       date TEXT NOT NULL,
-      created_at INTEGER DEFAULT (strftime('%s', 'now'))
+      created_at INTEGER DEFAULT (strftime('%s', 'now')),
+      FOREIGN KEY(game_id) REFERENCES games(id)
     );
   `);
   
   // 游戏统计表 - 存储聚合数据
   await db.execute(`
     CREATE TABLE IF NOT EXISTS game_statistics (
-      game_ref_id TEXT NOT NULL,
-      id_type TEXT NOT NULL,
+      game_id INTEGER PRIMARY KEY,
       total_time INTEGER DEFAULT 0,
       session_count INTEGER DEFAULT 0,
       last_played INTEGER,
       daily_stats TEXT DEFAULT '{}',
-      PRIMARY KEY (game_ref_id, id_type)
+      FOREIGN KEY(game_id) REFERENCES games(id)
     );
   `);
 }

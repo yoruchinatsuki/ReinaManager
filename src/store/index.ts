@@ -4,7 +4,7 @@ import type { GameData } from '@/types';
 import { 
   getGames as getGamesRepository, 
   insertGame as insertGameRepository,
-  getGameByGameId as getGameByIdRepository,
+  getGameById as getGameByIdRepository,
   deleteGame as deleteGameRepository,
 searchGames as searchGamesRepository ,
 filterGamesByType as filterGamesByTypeRepository 
@@ -21,7 +21,7 @@ import {
 } from '@/utils/localStorage';
 import { getBgmTokenRepository, setBgmTokenRepository } from '@/utils/settingsConfig';
 import { isTauri } from '@tauri-apps/api/core';
-import { getGamePlatformId } from '@/utils';
+// import { getGamePlatformId } from '@/utils';
 import { initializeGamePlayTracking } from './gamePlayStore';
 
 // 定义应用全局状态类型
@@ -36,13 +36,13 @@ export interface AppState {
   // BGM 令牌
   bgmToken: string;
   // UI 状态
-  selectedGameId: string | null;
+  selectedGameId: number | null;
   
   // 游戏操作方法
   fetchGames: (sortOption?: string, sortOrder?: 'asc' | 'desc',resetSearch?:boolean) => Promise<void>;
   addGame: (game: GameData) => Promise<void>;
-  deleteGame: (gameId: string) => Promise<void>;
-  getGameById: (gameId: string) => Promise<GameData>;
+  deleteGame: (gameId: number) => Promise<void>;
+  getGameById: (gameId: number) => Promise<GameData>;
   
   // 排序方法
   setSortOption: (option: string) => void;
@@ -53,7 +53,7 @@ export interface AppState {
   setBgmToken: (token: string) => Promise<void>;
   
   // UI 操作方法
-  setSelectedGameId: (id: string | null|undefined) => void;
+  setSelectedGameId: (id: number | null|undefined) => void;
   
   // 初始化
   initialize: () => Promise<void>;
@@ -68,7 +68,7 @@ export interface AppState {
 
   gameFilterType: 'all' | 'local' | 'online';
   setGameFilterType: (type: 'all' | 'local' | 'online') => void;
-  useIsLocalGame: (gameId: string) => boolean;
+  useIsLocalGame: (gameId: number) => boolean;
 }
 
 // 创建持久化的全局状态
@@ -170,7 +170,7 @@ refreshGameData: async (customSortOption?: string, customSortOrder?: 'asc' | 'de
       },
       
       // 使用通用函数简化 deleteGame
-      deleteGame: async (gameId: string): Promise<void> => {
+      deleteGame: async (gameId: number): Promise<void> => {
         try {
           if (isTauri()) {
             await deleteGameRepository(gameId);
@@ -185,9 +185,13 @@ refreshGameData: async (customSortOption?: string, customSortOrder?: 'asc' | 'de
         }
       },
       
-      getGameById: async (gameId: string): Promise<GameData> => {
+      getGameById: async (gameId: number): Promise<GameData> => {
         if (isTauri()) {
-          return await getGameByIdRepository(gameId);
+          const game = await getGameByIdRepository(gameId);
+          if (game === null) {
+            throw new Error(`Game with ID ${gameId} not found`);
+          }
+          return game;
         }
         return await Promise.resolve(getGameByIdLocal(gameId));
       },
@@ -309,7 +313,7 @@ setSortOrder: (order: 'asc' | 'desc') => {
       },
       
       // UI 操作方法
-      setSelectedGameId: (id: string | null|undefined) => {
+      setSelectedGameId: (id: number | null|undefined) => {
         set({ selectedGameId: id });
       },
 
@@ -357,11 +361,11 @@ setGameFilterType: (type: 'all' | 'local' | 'online') => {
     set({ loading: false });
   }
 },
-useIsLocalGame(gameId: string  ): boolean {
+useIsLocalGame(gameId: number  ): boolean {
     const games = useStore.getState().games; // 使用getState()而不是闭包中的state
     
     // 查找游戏
-    const game = games.find(g => getGamePlatformId(g) === gameId);
+    const game = games.find(g => g.id===gameId);
     
     // 检查游戏是否存在并且有localpath属性
     if (!game || !game.localpath){

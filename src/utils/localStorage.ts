@@ -1,10 +1,23 @@
 import type { GameData } from '@/types/index';
-import { getGamePlatformId } from '.';
 
 
 // 定义本地存储的 key
 const STORAGE_KEY = 'reina_manager_games';
 const STORAGE_KEY_SETTINGS = 'reina_manager_settings';
+
+// 定义存储下一个ID的键
+const NEXT_ID_KEY = 'reina_manager_next_id';
+
+// 获取下一个可用ID
+export function getNextId(): number {
+  // 读取当前ID值
+  const nextId = Number(localStorage.getItem(NEXT_ID_KEY)) || 1;
+  
+  // 增加ID并保存
+  localStorage.setItem(NEXT_ID_KEY, String(nextId + 1));
+  
+  return nextId;
+}
 
 // 设置类型定义
 interface Settings {
@@ -107,21 +120,27 @@ function setGames(games: GameData[]): void {
 // 插入一条游戏数据
 export function insertGame(game: GameData): void {
   const games = getGames();
+  
+  // 如果游戏没有ID，分配一个新ID
+  if (!game.id) {
+    game.id = getNextId();
+  }
+
   games.push(game);
   setGames(games);
 }
 
 // 删除一条游戏数据
-export function deleteGame(gameId: string): void {
+export function deleteGame(gameId: number): void {
   let games = getGames();
-  games = games.filter(game => getGamePlatformId(game) !== gameId);
+  games = games.filter(game => game.id !== gameId);
   setGames(games);
 }
 
 //通过 id 查找本地存储中的游戏数据
-export function getGameByIdLocal(gameId: string): GameData {
+export function getGameByIdLocal(gameId: number): GameData {
   const games = getGames();
-  const game = games.find(game => getGamePlatformId(game) === gameId);
+  const game = games.find(game => game.id === gameId);
   return game as GameData;
 }
 
@@ -215,4 +234,28 @@ export function filterGamesByTypeLocal(
     // 浏览器环境中没有本地游戏
     return [];
   
+}
+
+// 用于初始化或重置ID计数器的函数
+export function resetIdCounter(): void {
+  localStorage.setItem(NEXT_ID_KEY, '1');
+}
+
+// 用于同步ID计数器的函数，确保新ID大于所有现有ID
+export function syncIdCounter(): void {
+  const games = getGames();
+  
+  if (games.length === 0) {
+    resetIdCounter();
+    return;
+  }
+  
+  // 找出当前最大ID
+  const maxId = Math.max(...games.map(game => typeof game.id === 'number' ? game.id : 0));
+  
+  // 确保下一个ID比最大ID大
+  const currentNextId = Number(localStorage.getItem(NEXT_ID_KEY)) || 1;
+  if (maxId >= currentNextId) {
+    localStorage.setItem(NEXT_ID_KEY, String(maxId + 1));
+  }
 }

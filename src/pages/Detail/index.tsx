@@ -1,7 +1,6 @@
 import { useStore } from '@/store';
 import { useGamePlayStore } from '@/store/gamePlayStore';
 import { PageContainer } from '@toolpad/core';
-import { useLocation } from 'react-router';
 import type { GameData } from '@/types';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -12,8 +11,8 @@ import TodayIcon from '@mui/icons-material/Today';
 import BackupIcon from '@mui/icons-material/Backup';
 import { CircularProgress } from '@mui/material';
 import type { GameTimeStats } from '@/types';
-import { getGamePlatformId, isCustom } from '@/utils';
 import { LineChart } from '@mui/x-charts/LineChart';
+import { useLocation } from 'react-router';
 
 // 图表数据类型定义
 interface GameTimeChartData {
@@ -33,7 +32,7 @@ const InfoBox: React.FC<InfoBoxProps> = ({ game }) => {
     const [isInitialLoad, setIsInitialLoad] = useState(true);
     const { loadGameStats, runningGameIds } = useGamePlayStore();
     const [stats, setStats] = useState<GameTimeStats | null>(null);
-    const gameId = getGamePlatformId(game) as string;
+    const gameId = game.id as number;
 
     // 存储上一次游戏运行状态，用于检测变化
     const prevRunningRef = useRef(false);
@@ -224,13 +223,12 @@ const InfoBox: React.FC<InfoBoxProps> = ({ game }) => {
 export const Detail: React.FC = () => {
     const { t } = useTranslation();
     const { getGameById, setSelectedGameId } = useStore();
-    const [game, setGame] = useState<GameData | null>(null);
+    const [game, setGame] = useState<GameData>();
     const [loading, setLoading] = useState<boolean>(true);
-    const id = useLocation().pathname.split('/').pop();
+    const id = Number(useLocation().pathname.split('/').pop());
 
     // 加载游戏数据
     useEffect(() => {
-        if (!id) return;
         setLoading(true);
         getGameById(id)
             .then(data => {
@@ -267,7 +265,7 @@ export const Detail: React.FC = () => {
                             direction={{ xs: 'column', sm: 'row' }}
                             className="flex flex-wrap [&>div]:mr-6 [&>div]:mb-2"
                         >
-                            {isCustom(id) ?
+                            {game.id_type === 'custom' ?
                                 <Box>
                                     <Typography variant="subtitle2" fontWeight="bold">{t('pages.Detail.gameDatafrom')}</Typography>
                                     <Typography>custom</Typography>
@@ -296,7 +294,7 @@ export const Detail: React.FC = () => {
                                     <Typography variant="subtitle2" fontWeight="bold">{t('pages.Detail.gameRanking')}</Typography>
                                     <Typography>{game.rank || '-'}</Typography>
                                 </Box>}
-                            {game.aveage_hours !== null &&
+                            {game.aveage_hours &&
                                 <Box>
                                     <Typography variant="subtitle2" fontWeight="bold">{t('pages.Detail.expected_hours')}</Typography>
                                     <Typography>{game.aveage_hours || '-'}h</Typography>

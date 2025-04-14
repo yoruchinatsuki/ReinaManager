@@ -10,6 +10,7 @@ export interface GameData {
     score?: number;
     bgm_id?: string|null;
     vndb_id?: string|null;
+    id_type?: string|'bgm' | 'vndb' | 'mixed' | 'custom';
     time: Date;
     localpath?: string;
     developer?: string|null;
@@ -19,16 +20,14 @@ export interface GameData {
 
 
 export interface HanleGamesProps  {
-    id: string|undefined|null;
-    getGameById: (id: string) => Promise<GameData>;
+    id: number|undefined|null;
+    getGameById: (id: number) => Promise<GameData>;
     canUse?: () => boolean;
 }
 
 // 游戏会话记录
 export interface GameSession {
-  id?: number;
-  game_ref_id: string;
-  id_type: 'bgm' | 'vndb';
+  game_id: number; // 游戏的唯一标识符
   start_time: number;
   end_time?: number;
   duration?: number; // 分钟
@@ -37,8 +36,7 @@ export interface GameSession {
 
 // 游戏统计数据
 export interface GameStatistics {
-  game_ref_id: string;
-  id_type: 'bgm' | 'vndb';
+  game_id: number; // 游戏的唯一标识符
   total_time: number; // 分钟
   session_count: number;
   last_played?: number;
@@ -57,6 +55,6 @@ export interface GameTimeStats {
 }
 
 // 回调函数类型
-export type TimeUpdateCallback = (gameId: string, minutes: number) => void;
-export type SessionEndCallback = (gameId: string, minutes: number) => void;
+export type TimeUpdateCallback = (gameId: number, minutes: number) => void;
+export type SessionEndCallback = (gameId: number, minutes: number) => void;
 

@@ -1,12 +1,11 @@
 import { listen } from '@tauri-apps/api/event';
 import { invoke, isTauri } from '@tauri-apps/api/core';
 import { getDb } from './database';
-import { getIdType } from './repository';
 import type { GameSession, GameStatistics, GameTimeStats } from '../types';
 
 // 类型定义
-export type TimeUpdateCallback = (gameId: string, minutes: number) => void;
-export type SessionEndCallback = (gameId: string, minutes: number) => void;
+export type TimeUpdateCallback = (gameId: number, minutes: number) => void;
+export type SessionEndCallback = (gameId: number, minutes: number) => void;
 
 // 格式化游戏时间
 export function formatPlayTime(minutes: number): string {
@@ -22,23 +21,14 @@ export function formatPlayTime(minutes: number): string {
   return `${hours}小时${mins > 0 ? `${mins}分钟` : ''}`;
 }
 
-// 记录游戏会话
+// 记录游戏会话 - 直接使用内部ID
 export async function recordGameSession(
-  gameId: string, 
+  gameId: number, // 改为number类型
   minutes: number, 
   startTime: number, 
   endTime: number,
 ): Promise<number> {
   const db = await getDb();
-  const idParts = getIdType(gameId);
-  
-  if (!idParts || idParts.type === 'unknown' || !idParts.params[0]) {
-    console.error(`无效的游戏ID: ${gameId}`);
-    return -1;
-  }
-  
-  const refId = idParts.params[0];
-  const idType = idParts.type;
   
   // 当前日期，格式YYYY-MM-DD
   const date = new Date(endTime * 1000).toISOString().split('T')[0];
@@ -47,13 +37,13 @@ export async function recordGameSession(
     // 插入游戏会话记录
     const result = await db.execute(
       `INSERT INTO game_sessions (
-        game_ref_id, id_type, start_time, end_time, duration, date
-      ) VALUES (?, ?, ?, ?, ?, ?);`,
-      [refId, idType, startTime, endTime, minutes, date],
+        game_id, start_time, end_time, duration, date
+      ) VALUES (?, ?, ?, ?, ?);`,
+      [gameId, startTime, endTime, minutes, date],
     );
     
     // 更新统计信息
-    await updateGameStatistics(refId, idType);
+    await updateGameStatistics(gameId);
     
     return result.lastInsertId ?? -1;
   } catch (error) {
@@ -62,8 +52,8 @@ export async function recordGameSession(
   }
 }
 
-// 更新游戏统计信息
-export async function updateGameStatistics(gameRefId: string, idType: 'bgm' | 'vndb'): Promise<void> {
+// 更新游戏统计信息 - 直接使用内部ID
+export async function updateGameStatistics(gameId: number): Promise<void> {
   const db = await getDb();
   
   try {
@@ -78,22 +68,20 @@ export async function updateGameStatistics(gameRefId: string, idType: 'bgm' | 'v
         COUNT(*) as session_count,
         MAX(end_time) as last_played
       FROM game_sessions 
-      WHERE game_ref_id = ? AND id_type = ?;
-    `, [gameRefId, idType]);
+      WHERE game_id = ?;
+    `, [gameId]);
     
     // 计算每日统计数据
     const dailyStats = await db.select<{
       date: string;
       duration: number;
     }[]>(`
-      SELECT 
-        date, 
-        SUM(duration) as duration
+      SELECT date, SUM(duration) as duration
       FROM game_sessions 
-      WHERE game_ref_id = ? AND id_type = ?
+      WHERE game_id = ?
       GROUP BY date
       ORDER BY date DESC;
-    `, [gameRefId, idType]);
+    `, [gameId]);
     
     // 转换为数组套对象格式
     const dailyStatsArray = dailyStats.map(({ date, duration }) => ({
@@ -104,11 +92,10 @@ export async function updateGameStatistics(gameRefId: string, idType: 'bgm' | 'v
     // 更新统计表
     await db.execute(
       `REPLACE INTO game_statistics 
-       (game_ref_id, id_type, total_time, session_count, last_played, daily_stats)
-       VALUES (?, ?, ?, ?, ?, ?);`,
+       (game_id, total_time, session_count, last_played, daily_stats)
+       VALUES (?, ?, ?, ?, ?);`,
       [
-        gameRefId,
-        idType,
+        gameId,
         stats[0]?.total_time || 0,
         stats[0]?.session_count || 0,
         stats[0]?.last_played || null,
@@ -121,21 +108,13 @@ export async function updateGameStatistics(gameRefId: string, idType: 'bgm' | 'v
   }
 }
 
-// 获取游戏统计信息
-export async function getGameStatistics(gameId: string): Promise<GameStatistics | null> {
+// 获取游戏统计信息 - 直接使用内部ID
+export async function getGameStatistics(gameId: number): Promise<GameStatistics | null> {
   const db = await getDb();
-  const idInfo = getIdType(gameId);
-  
-  if (!idInfo || idInfo.type === 'unknown' || !idInfo.params[0]) {
-    return null;
-  }
-  
-  const refId = idInfo.params[0];
-  const idType = idInfo.type;
   
   const stats = await db.select<GameStatistics[]>(
-    'SELECT * FROM game_statistics WHERE game_ref_id = ? AND id_type = ?;',
-    [refId, idType],
+    'SELECT * FROM game_statistics WHERE game_id = ?;',
+    [gameId],
   );
   
   if (stats.length === 0) {
@@ -167,8 +146,8 @@ export async function getGameStatistics(gameId: string): Promise<GameStatistics 
   return result;
 }
 
-// 获取今天的游戏时间
-export async function getTodayGameTime(gameId: string): Promise<number> {
+// 获取今天的游戏时间 - 直接使用内部ID
+export async function getTodayGameTime(gameId: number): Promise<number> {
   const stats = await getGameStatistics(gameId);
   const today = new Date().toISOString().split('T')[0];
   
@@ -181,37 +160,29 @@ export async function getTodayGameTime(gameId: string): Promise<number> {
   return todayRecord?.playtime || 0;
 }
 
-// 获取游戏会话历史
+// 获取游戏会话历史 - 直接使用内部ID
 export async function getGameSessions(
-  gameId: string, 
+  gameId: number,
   limit = 10, 
   offset = 0,
 ): Promise<GameSession[]> {
   const db = await getDb();
-  const idInfo = getIdType(gameId);
-  
-  if (!idInfo || idInfo.type === 'unknown' || !idInfo.params[0]) {
-    return [];
-  }
-  
-  const refId = idInfo.params[0];
-  const idType = idInfo.type;
   
   const sessions = await db.select<GameSession[]>(
     `
     SELECT * FROM game_sessions
-    WHERE game_ref_id = ? AND id_type = ?
+    WHERE game_id = ?
     ORDER BY start_time DESC
     LIMIT ? OFFSET ?;
     `,
-    [refId, idType, limit, offset],
+    [gameId, limit, offset],
   );
   
   return sessions;
 }
 
-// 获取格式化的游戏时间统计
-export async function getFormattedGameStats(gameId: string): Promise<GameTimeStats> {
+// 获取格式化的游戏时间统计 - 直接使用内部ID
+export async function getFormattedGameStats(gameId: number): Promise<GameTimeStats> {
   const stats = await getGameStatistics(gameId);
   const todayMinutes = await getTodayGameTime(gameId);
   
@@ -234,126 +205,107 @@ export function initGameTimeTracking(
   if (!isTauri()) return () => {};
 
   // 游戏会话开始
-  const unlistenStart = listen<{gameId: string; processId: number; startTime: number}>(
+  const unlistenStart = listen<{gameId: number; processId: number; startTime: number}>(
     'game-session-started',
     async (event) => {
       const { gameId } = event.payload;
       
       try {
-        // 更新会话计数
+        // 直接使用数字类型的gameId
         const db = await getDb();
-        const idInfo = getIdType(gameId);
-        
-        if (!idInfo || idInfo.type === 'unknown' || !idInfo.params[0]) {
-          return;
-        }
-        
-        const refId = idInfo.params[0];
-        const idType = idInfo.type;
         
         await db.execute(`
           INSERT INTO game_statistics 
-          (game_ref_id, id_type, total_time, session_count, last_played) 
-          VALUES (?, ?, 0, 1, ?)
-          ON CONFLICT(game_ref_id, id_type) DO UPDATE SET
+          (game_id, total_time, session_count, last_played) 
+          VALUES (?, 0, 1, ?)
+          ON CONFLICT(game_id) DO UPDATE SET
           session_count = session_count + 1,
           last_played = excluded.last_played;
-        `, [refId, idType, Math.floor(Date.now() / 1000)]);
+        `, [gameId, Math.floor(Date.now() / 1000)]);
       } catch (error) {
         console.error('增加游戏会话计数失败:', error);
       }
     }
   );
 
-// 游戏时间更新事件监听
-const unlistenUpdate = listen<{gameId: string; totalMinutes: number; processId: number}>(
-  'game-time-update',
-  async (event) => {
-    const { gameId } = event.payload;
-    
-    try {
-      // 实时更新数据库中的总时间
-      const db = await getDb();
-      const idInfo = getIdType(gameId);
+  // 游戏时间更新事件监听
+  const unlistenUpdate = listen<{gameId: number; totalMinutes: number; processId: number}>(
+    'game-time-update',
+    async (event) => {
+      const { gameId, totalMinutes } = event.payload;
       
-      if (!idInfo || idInfo.type === 'unknown' || !idInfo.params[0]) {
-        return;
-      }
-      
-      const refId = idInfo.params[0];
-      const idType = idInfo.type;
-      const today = new Date().toISOString().split('T')[0];
-      
-      // 先获取当前统计数据
-      const currentStats = await db.select<{daily_stats: string}[]>(
-        'SELECT daily_stats FROM game_statistics WHERE game_ref_id = ? AND id_type = ?;',
-        [refId, idType]
-      );
-      
-      let dailyStats: Array<{date: string; playtime: number}> = [];
-      
-      // 如果有现有数据，解析它
-      if (currentStats.length > 0 && currentStats[0].daily_stats) {
-        try {
-          const parsed = JSON.parse(currentStats[0].daily_stats);
-          
-          // 兼容旧版格式
-          if (Array.isArray(parsed)) {
-            dailyStats = parsed;
-          } else {
-            // 旧的对象格式，转换为数组
-            dailyStats = Object.entries(parsed).map(([date, minutes]) => ({
-              date,
-              playtime: minutes as number
-            }));
+      try {
+        // 直接使用数字类型的gameId进行查询
+        const db = await getDb();
+        const today = new Date().toISOString().split('T')[0];
+        
+        // 获取当前统计数据
+        const currentStats = await db.select<{daily_stats: string}[]>(
+          'SELECT daily_stats FROM game_statistics WHERE game_id = ?;',
+          [gameId]
+        );
+        
+        let dailyStats: Array<{date: string; playtime: number}> = [];
+        
+        // 解析已有数据
+        if (currentStats.length > 0 && currentStats[0].daily_stats) {
+          try {
+            const parsed = JSON.parse(currentStats[0].daily_stats);
+            
+            // 兼容旧版格式
+            if (Array.isArray(parsed)) {
+              dailyStats = parsed;
+            } else {
+              dailyStats = Object.entries(parsed).map(([date, minutes]) => ({
+                date,
+                playtime: minutes as number
+              }));
+            }
+          } catch (e) {
+            console.error('解析游戏统计数据失败:', e);
           }
-        } catch (e) {
-          console.error('解析游戏统计数据失败:', e);
         }
+        
+        // 更新今天的记录
+        const todayIndex = dailyStats.findIndex(item => item.date === today);
+        
+        if (todayIndex >= 0) {
+          dailyStats[todayIndex].playtime += 1;
+        } else {
+          dailyStats.push({ date: today, playtime: 1 });
+        }
+        
+        // 更新统计
+        await db.execute(
+          `UPDATE game_statistics 
+           SET 
+             total_time = COALESCE(total_time, 0) + 1,
+             daily_stats = ?
+           WHERE game_id = ?;`,
+          [JSON.stringify(dailyStats), gameId]
+        );
+        
+        // 调用回调函数
+        if (onTimeUpdate) {
+          onTimeUpdate(gameId, totalMinutes);
+        }
+      } catch (error) {
+        console.error('更新游戏实时统计失败:', error);
       }
-      
-      // 查找今天的记录
-      const todayIndex = dailyStats.findIndex(item => item.date === today);
-      
-      if (todayIndex >= 0) {
-        // 已有今天的记录，更新它
-        dailyStats[todayIndex].playtime += 1;
-      } else {
-        // 添加今天的新记录
-        dailyStats.push({ date: today, playtime: 1 });
-      }
-      
-      // 更新游戏统计
-      await db.execute(
-        `UPDATE game_statistics 
-         SET 
-           total_time = COALESCE(total_time, 0) + 1,
-           daily_stats = ?
-         WHERE game_ref_id = ? AND id_type = ?;`,
-        [JSON.stringify(dailyStats), refId, idType]
-      );
-      
-      // 调用回调函数
-      if (onTimeUpdate) {
-        onTimeUpdate(event.payload.gameId, event.payload.totalMinutes);
-      }
-    } catch (error) {
-      console.error('更新游戏实时统计失败:', error);
     }
-  }
-);
+  );
 
   // 游戏会话结束
-  const unlistenEnd = listen<{gameId: string; totalMinutes: number; startTime: number; endTime: number; processId: number}>(
+  const unlistenEnd = listen<{gameId: number; totalMinutes: number; startTime: number; endTime: number; processId: number}>(
     'game-session-ended',
     async (event) => {
       const { gameId, totalMinutes, startTime, endTime } = event.payload;
       
       try {
-        // 记录完整的游戏会话
+        // 直接使用数字类型的gameId
         await recordGameSession(gameId, totalMinutes, startTime, endTime);
         
-        // 调用回调函数
+        // 调用回调函数时转换为字符串（如果回调函数期望字符串）
         if (onSessionEnd) {
           onSessionEnd(gameId, totalMinutes);
         }
@@ -374,7 +326,7 @@ const unlistenUpdate = listen<{gameId: string; totalMinutes: number; processId: 
 // 启动游戏并开始监控
 export async function launchGameWithTracking(
   gamePath: string, 
-  gameId: string, 
+  gameId: number,  // 改为number类型
   args?: string[],
 ): Promise<{success: boolean; message: string; process_id?: number}> {
   try {
@@ -390,60 +342,3 @@ export async function launchGameWithTracking(
     throw new Error(errorMessage);
   }
 }
-
-// 获取游戏时间统计趋势数据（按日期）
-// export async function getGameTimeTrend(
-//   gameId: string,
-//   days = 7,
-// ): Promise<{date: string; playtime: number}[]> {
-//   const db = await getDb();
-//   const idInfo = getIdType(gameId);
-  
-//   if (!idInfo || idInfo.type === 'unknown' || !idInfo.params[0]) {
-//     return [];
-//   }
-  
-//   const refId = idInfo.params[0];
-//   const idType = idInfo.type;
-  
-//   // 计算起始日期
-//   const endDate = new Date();
-//   const startDate = new Date();
-//   startDate.setDate(startDate.getDate() - days + 1);
-  
-//   const startDateStr = startDate.toISOString().split('T')[0];
-//   const endDateStr = endDate.toISOString().split('T')[0];
-  
-//   // 查询日期范围内的游戏时间
-//   interface TrendResult {
-//     date: string;
-//     duration: number;
-//   }
-
-//   const results = await db.select<TrendResult[]>(
-//     `
-//     SELECT 
-//       date, 
-//       SUM(duration) as duration
-//     FROM game_sessions 
-//     WHERE game_ref_id = ? AND id_type = ? AND date >= ? AND date <= ?
-//     GROUP BY date
-//     ORDER BY date ASC;
-//     `,
-//     [refId, idType, startDateStr, endDateStr],
-//   );
-  
-//   // 生成完整的日期范围数据（包括无数据的日期）
-//   const trend: {date: string; playtime: number}[] = [];
-//   const dateMap = new Map(results.map(item => [item.date, item.duration]));
-  
-//   for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
-//     const dateStr = d.toISOString().split('T')[0];
-//     trend.push({
-//       date: dateStr,
-//       playtime: dateMap.get(dateStr) || 0,
-//     });
-//   }
-  
-//   return trend;
-// }

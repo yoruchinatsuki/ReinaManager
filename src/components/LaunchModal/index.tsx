@@ -7,7 +7,7 @@ import { isTauri } from '@tauri-apps/api/core';
 import { useTranslation } from 'react-i18next';
 
 interface LaunchModalProps {
-    game_id?: string;
+    game_id?: number;
 }
 
 export const LaunchModal = ({ game_id }: LaunchModalProps) => {

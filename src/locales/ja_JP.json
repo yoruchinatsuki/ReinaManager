@@ -48,7 +48,8 @@
             "deleteGame": "ゲームを削除",
             "bgmlink": "Bangumiページを見る",
             "vndblink": "Vndbページを見る",
-            "editModal": "ゲームを編集"
+            "editModal": "ゲームを編集",
+            "more": "その他"
         },
         "LaunchModal": {
             "launchGame": "ゲームを起動",
@@ -76,9 +77,11 @@
         },
         "AlertBox": {
             "cancel": "キャンセル",
+            "confirm": "確認",
             "confirmDelete": "削除を確認",
-            "deleteGameTitle": "ゲームを削除しますか？",
-            "deleteGameMessage": "この操作は取り消せません。このゲームを削除してもよろしいですか？"
+            "deleteGameTitle": "ゲームを削除",
+            "deleteGameMessage": "このゲームを削除してもよろしいですか？この操作は取り消せません。",
+            "processing": "処理中..."
         },
         "AddModal": {
             "addGame": "ゲームを追加",

@@ -27,7 +27,7 @@ fn get_timestamp() -> u64 {
 
 // 监控游戏进程
 #[tauri::command]
-pub async fn monitor_game<R: Runtime>(app_handle: AppHandle<R>, game_id: String, process_id: u32) {
+pub async fn monitor_game<R: Runtime>(app_handle: AppHandle<R>, game_id: u32, process_id: u32) {
     // 在新线程中启动监控，避免阻塞Tauri事件循环
     let app_handle_clone = app_handle.clone();
     thread::spawn(move || {
@@ -40,7 +40,7 @@ pub async fn monitor_game<R: Runtime>(app_handle: AppHandle<R>, game_id: String,
 // 实际的监控循环
 fn run_game_monitor<R: Runtime>(
     app_handle: AppHandle<R>,
-    game_id: String,
+    game_id: u32,
     mut process_id: u32,
 ) -> Result<(), String> {
     let mut accumulated_seconds = 0;
