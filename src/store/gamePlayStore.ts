@@ -5,8 +5,10 @@ import {
   getGameSessions,
   launchGameWithTracking,
   initGameTimeTracking,
+  getGameStatistics
 } from '@/utils/gameStats';
 import type { GameSession, GameTimeStats } from '@/types';
+import { useStore } from '@/store';
 
 
 interface LaunchGameResult {
@@ -40,6 +42,9 @@ interface GamePlayState {
   initTimeTracking: () => void;
   clearActiveGame: () => void;
   getGameRealTimeState: (gameId: number) => GameRealTimeState | null;
+  getTotalPlayTime: () => Promise<number>;
+  getWeekPlayTime: () => Promise<number>;
+  getTodayPlayTime: () => Promise<number>;
 }
 
 export const useGamePlayStore = create<GamePlayState>((set, get) => ({
@@ -177,32 +182,6 @@ export const useGamePlayStore = create<GamePlayState>((set, get) => ({
     }
   },
   
-  // loadGameTrend: async (gameId: string, days = 7): Promise<GameTimeChartData[] | null> => {
-  //   try {
-  //     if (!isTauri()) return null;
-      
-  //     // 检查缓存
-  //     const cached = get().trendData[gameId];
-  //     if (cached) return cached;
-      
-  //     // 获取新数据
-  //     const trend = await getGameTimeTrend(gameId, days);
-      
-  //     // 更新状态
-  //     set(state => ({
-  //       trendData: {
-  //         ...state.trendData,
-  //         [gameId]: trend
-  //       }
-  //     }));
-      
-  //     return trend;
-  //   } catch (error) {
-  //     console.error('加载游戏时间趋势数据失败:', error);
-  //     return null;
-  //   }
-  // },
-  
   loadRecentSessions: async (gameId: number, limit = 5): Promise<GameSession[] | null> => {
     try {
       if (!isTauri()) return null;
@@ -289,7 +268,54 @@ export const useGamePlayStore = create<GamePlayState>((set, get) => ({
       runningGameIds: new Set<number>(),
       gameRealTimeStates: {} 
     });
-  }
+  },
+  getTotalPlayTime: async () => {
+    const { games } = useStore.getState();
+    let total = 0;
+    for (const game of games) {
+      if (!game.id) continue;
+      const stats = await getGameStatistics(game.id);
+      if (stats && typeof stats.total_time === 'number') {
+        total += stats.total_time;
+      }
+    }
+    return total;
+  },
+  getWeekPlayTime: async () => {
+    const { games } = useStore.getState();
+    let total = 0;
+    const now = new Date();
+    const weekStart = new Date(now);
+    weekStart.setDate(now.getDate() - now.getDay());
+    for (const game of games) {
+      if (!game.id) continue;
+      const stats = await getGameStatistics(game.id);
+      if (stats && Array.isArray(stats.daily_stats)) {
+        for (const record of stats.daily_stats) {
+          if (record.date && new Date(record.date) >= weekStart) {
+            total += record.playtime || 0;
+          }
+        }
+      }
+    }
+    return total;
+  },
+  getTodayPlayTime: async () => {
+    const { games } = useStore.getState();
+    let total = 0;
+    const today = new Date().toISOString().split('T')[0];
+    for (const game of games) {
+      if (!game.id) continue;
+      const stats = await getGameStatistics(game.id);
+      if (stats && Array.isArray(stats.daily_stats)) {
+        const todayRecord = stats.daily_stats.find((r) => r.date === today);
+        if (todayRecord) {
+          total += todayRecord.playtime || 0;
+        }
+      }
+    }
+    return total;
+  },
 }));
 
 // 在应用启动时初始化时间跟踪

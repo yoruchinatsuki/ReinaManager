@@ -29,7 +29,7 @@ function SidebarFooter({ mini }: SidebarFooterProps) {
 const CustomAppTitle = ({ isLibraries }: CustomAppTitleProps) => {
     return (
         <Stack direction="row" alignItems="center" spacing={2} className='select-none'>
-            <Avatar alt='Reina' src='./images/reina.png' onDragStart={(event) => event.preventDefault()} />
+            <Avatar alt='Reina' src='/images/reina.png' onDragStart={(event) => event.preventDefault()} />
             <Typography variant="h6">ReinaManager</Typography>
             <Chip size="small" label="BETA" color="info" />
             {isLibraries && <SearchBox />}

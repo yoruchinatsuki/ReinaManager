@@ -14,7 +14,7 @@ document.addEventListener('keydown', (e) => {
     e.preventDefault()
   }
 
-  if (e.ctrlKey && ['r', 'u', 'p', 'l', 'j', 'g', 'f', 's'].includes(e.key.toLowerCase())) {
+  if (e.ctrlKey && ['r', 'u', 'p', 'l', 'j', 'g', 'f', 's', 'a'].includes(e.key.toLowerCase())) {
     e.preventDefault()
   }
 })

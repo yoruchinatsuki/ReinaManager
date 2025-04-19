@@ -106,5 +106,42 @@
             "cancel": "取消",
             "apply": "应用"
         }
+    },
+    "home": {
+        "title": "主页",
+        "stats": {
+            "totalGames": "总游戏数",
+            "localGames": "本地游戏数",
+            "completedGames": "通关游戏数",
+            "totalPlayTime": "总游戏时长",
+            "weekPlayTime": "本周游戏时长",
+            "todayPlayTime": "今日游戏时长"
+        },
+        "repository": "游戏仓库",
+        "activityTitle": "动态",
+        "activity": {
+        "added": "添加了 {{title}}",
+        "played": "游玩了 {{title}}",
+        "addedAt": "添加于 {{time}}",
+        "playedAtTime": "游玩于 {{time}}",  
+        "duration": "游戏时长: {{duration}}"
+    },
+        "lastPlayed": "最后游玩: {{time}}",
+        "addedAt": "添加时间: {{time}}",
+        "recentlyPlayed": "最近游玩",
+        "recentlyAdded": "最近添加"
+    },
+    "utils":{
+        "relativetime":{
+            "justNow": "刚刚",
+            "minutesAgo": "{{count}}分钟前",
+            "hoursAgo": "{{count}}小时前",
+            "daysAgo": "{{count}}天前",
+            "lastWeek": "上周"
+        },
+        "formatPlayTime":{
+            "minutes": "{{count}}分钟",
+            "hours": "{{count}}小时"
+        }
     }
 }

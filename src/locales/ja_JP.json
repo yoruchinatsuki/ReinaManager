@@ -106,5 +106,42 @@
             "cancel": "キャンセル",
             "apply": "適用"
         }
+    },
+    "home": {
+        "title": "ホーム",
+        "stats": {
+            "totalGames": "総ゲーム数",
+            "localGames": "ローカルゲーム数",
+            "completedGames": "クリアしたゲーム数",
+            "totalPlayTime": "総プレイ時間",
+            "weekPlayTime": "今週のプレイ時間",
+            "todayPlayTime": "今日のプレイ時間"
+        },
+        "repository": "ゲームリポジトリ",
+        "activityTitle": "アクティビティ",
+        "activity": {
+            "added": "{{title}}を追加しました",
+            "played": "{{title}}をプレイしました",
+            "addedAt": "{{time}}に追加",
+            "playedAtTime": "{{time}}にプレイ",  
+            "duration": "プレイ時間: {{duration}}"
+        },
+        "lastPlayed": "最終プレイ: {{time}}",
+        "addedAt": "追加時間: {{time}}",
+        "recentlyPlayed": "最近プレイしたゲーム",
+        "recentlyAdded": "最近追加したゲーム"
+    },
+    "utils":{
+        "relativetime":{
+            "justNow": "たった今",
+            "minutesAgo": "{{count}}分前",
+            "hoursAgo": "{{count}}時間前",
+            "daysAgo": "{{count}}日前",
+            "lastWeek": "先週"
+        },
+        "formatPlayTime":{
+            "minutes": "{{count}}分",
+            "hours": "{{count}}時間"
+        }
     }
 }

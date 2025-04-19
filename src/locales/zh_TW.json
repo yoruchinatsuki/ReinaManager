@@ -106,5 +106,42 @@
             "cancel": "取消",
             "apply": "應用"
         }
+    },
+    "home": {
+        "title": "首頁",
+        "stats": {
+            "totalGames": "總遊戲數",
+            "localGames": "本地遊戲數",
+            "completedGames": "通關遊戲數",
+            "totalPlayTime": "總遊戲時長",
+            "weekPlayTime": "本週遊戲時長",
+            "todayPlayTime": "今日遊戲時長"
+        },
+        "repository": "遊戲倉庫",
+        "activityTitle": "動態",
+        "activity": {
+            "added": "添加了 {{title}}",
+            "played": "遊玩了 {{title}}",
+            "addedAt": "添加於 {{time}}",
+            "playedAtTime": "遊玩於 {{time}}",  
+            "duration": "遊戲時長: {{duration}}"
+        },
+        "lastPlayed": "最後遊玩: {{time}}",
+        "addedAt": "添加時間: {{time}}",
+        "recentlyPlayed": "最近遊玩",
+        "recentlyAdded": "最近添加"
+    },
+    "utils":{
+        "relativetime":{
+            "justNow": "剛剛",
+            "minutesAgo": "{{count}}分鐘前",
+            "hoursAgo": "{{count}}小時前",
+            "daysAgo": "{{count}}天前",
+            "lastWeek": "上週"
+        },
+        "formatPlayTime":{
+            "minutes": "{{count}}分鐘",
+            "hours": "{{count}}小時"
+        }
     }
 }

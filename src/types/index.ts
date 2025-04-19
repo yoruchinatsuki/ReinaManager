@@ -27,6 +27,7 @@ export interface HanleGamesProps  {
 
 // 游戏会话记录
 export interface GameSession {
+  session_id: number; // 会话的唯一标识符
   game_id: number; // 游戏的唯一标识符
   start_time: number;
   end_time?: number;

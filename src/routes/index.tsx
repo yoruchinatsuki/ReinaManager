@@ -6,11 +6,12 @@ import { Settings } from '@/pages/Settings';
 import Card from '@/components/Cards';
 import { Libraries } from '@/pages/Libraries';
 import { Detail } from '@/pages/Detail';
-import { createHashRouter, type RouteObject } from 'react-router';
+import { createBrowserRouter, createHashRouter, type RouteObject } from 'react-router';
 import React from 'react';
 import Layout from '@/components/Layout';
 import App from '@/App';
 import { Edit } from '@/pages/Edit';
+import { isTauri } from '@tauri-apps/api/core';
 
 export interface RouteConfig {
     title: string;
@@ -86,7 +87,8 @@ const generateRoutes = (routes: RouteGroup[]): RouteObject[] => {
     );
 };
 
-export const routers = createHashRouter([
+// 定义路由配置
+const routeConfig = [
     {
         Component: App,
         children: [
@@ -97,4 +99,6 @@ export const routers = createHashRouter([
             },
         ],
     },
-]);
+];
+
+export const routers = (isTauri() ? createBrowserRouter : createHashRouter)(routeConfig);

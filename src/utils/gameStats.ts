@@ -2,24 +2,13 @@ import { listen } from '@tauri-apps/api/event';
 import { invoke, isTauri } from '@tauri-apps/api/core';
 import { getDb } from './database';
 import type { GameSession, GameStatistics, GameTimeStats } from '../types';
+import { formatPlayTime } from '@/utils';
 
 // 类型定义
 export type TimeUpdateCallback = (gameId: number, minutes: number) => void;
 export type SessionEndCallback = (gameId: number, minutes: number) => void;
 
-// 格式化游戏时间
-export function formatPlayTime(minutes: number): string {
-  if (!minutes) return '0分钟';
-  
-  const hours = Math.floor(minutes / 60);
-  const mins = minutes % 60;
-  
-  if (hours === 0) {
-    return `${mins}分钟`;
-  }
-  
-  return `${hours}小时${mins > 0 ? `${mins}分钟` : ''}`;
-}
+
 
 // 记录游戏会话 - 直接使用内部ID
 export async function recordGameSession(

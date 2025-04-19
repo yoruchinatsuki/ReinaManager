@@ -2,6 +2,7 @@ import { open } from '@tauri-apps/plugin-shell';
 import { invoke, isTauri } from '@tauri-apps/api/core';
 import {path} from '@tauri-apps/api';
 import type { GameData, HanleGamesProps } from '@/types';
+import i18next from 'i18next';
 // import { createTheme } from '@mui/material/styles';
 
 
@@ -9,27 +10,7 @@ export const time_now=()=>{
     // 获取当前时间
 const currentDate = new Date();
 
-// // 获取当前年份
-// const year = currentDate.getFullYear();
-
-// // 获取当前月份
-// const month = currentDate.getMonth() + 1;
-
-// // 获取当前日期
-// const date = currentDate.getDate();
-
-// // 获取当前小时
-// const hours = currentDate.getHours();
-
-// // 获取当前分钟
-// const minutes = currentDate.getMinutes();
-
-// // 获取当前秒数
-// const seconds = currentDate.getSeconds();
-
 return currentDate;
-
-// console.log(`当前时间：${year}-${month}-${date}${hours}:${minutes}:${seconds}`);
 
 }
 
@@ -81,16 +62,61 @@ export function getGamePlatformId(game: GameData): string | undefined {
   return undefined;
 }
 
-// // 改进版本，使用更清晰的函数设计
-// export function isCustom(gameOrId: GameData | string | undefined): boolean {
-//   if (!gameOrId) return false;
-  
-//   // 如果传入的是游戏对象
-//   if (typeof gameOrId !== 'string') {
-//     return Boolean(gameOrId.bgm_id?.includes("custom"));
-//   }
-  
-//   // 如果传入的是字符串ID
-//   return gameOrId.includes("custom");
-// }
+export function formatRelativeTime(time: string | number | Date): string {
+    const now = new Date();
+    const target = time instanceof Date 
+        ? time 
+        : typeof time === 'number'
+            ? new Date(time * (time.toString().length === 10 ? 1000 : 1))
+            : new Date(time);
+    
+    const diff = (now.getTime() - target.getTime()) / 1000; // 秒
+    
+    if (diff < 60) return i18next.t('utils.relativetime.justNow'); // 刚刚
+    if (diff < 3600) {
+        const minutes = Math.floor(diff / 60);
+        return i18next.t('utils.relativetime.minutesAgo', { count: minutes });
+    }
+    if (diff < 86400) {
+        const hours = Math.floor(diff / 3600);
+        return i18next.t('utils.relativetime.hoursAgo', { count: hours });
+    }
+    if (diff < 7 * 86400) {
+        const days = Math.floor(diff / 86400);
+        return i18next.t('utils.relativetime.daysAgo', { count: days });
+    }
 
+    // 判断是否为上周
+    const nowWeek = getWeekNumber(now);
+    const targetWeek = getWeekNumber(target);
+    if (now.getFullYear() === target.getFullYear() && nowWeek - targetWeek === 1) {
+        return i18next.t('utils.relativetime.lastWeek');
+    }
+
+    // 超过一周，返回日期
+    return target.toLocaleDateString();
+}
+
+function getWeekNumber(date: Date): number {
+    const firstDay = new Date(date.getFullYear(), 0, 1);
+    const dayOfYear = ((date.getTime() - firstDay.getTime()) / 86400000) + 1;
+    return Math.ceil(dayOfYear / 7);
+}
+
+// 格式化游戏时间
+export function formatPlayTime(minutes: number): string {
+  if (!minutes) return i18next.t('utils.formatPlayTime.minutes', { count: 0 }); 
+  
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  
+  if (hours === 0) {
+    return i18next.t('utils.formatPlayTime.minutes', { count: mins });
+  }
+  
+  if (mins > 0) {
+    return i18next.t('utils.formatPlayTime.hoursAndMinutes', { hours, minutes: mins });
+  } 
+    return i18next.t('utils.formatPlayTime.hours', { count: hours });
+  
+}

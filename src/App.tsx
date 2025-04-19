@@ -8,7 +8,6 @@ import GamesIcon from '@mui/icons-material/Games';
 import SettingsIcon from '@mui/icons-material/Settings';
 import { useStore } from './store';
 import { useTranslation } from 'react-i18next';
-// import { getGamePlatformId } from '@/utils';
 
 const App: React.FC = () => {
   const { t } = useTranslation();

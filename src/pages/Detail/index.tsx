@@ -255,7 +255,8 @@ export const Detail: React.FC = () => {
                         <img
                             src={game.image}
                             alt={game.name}
-                            className="max-h-65 max-w-40 lg:max-w-80 rounded-lg shadow-lg"
+                            className="max-h-65 max-w-40 lg:max-w-80 rounded-lg shadow-lg select-none"
+                            onDragStart={(event) => event.preventDefault()}
                         />
                     </Box>
 

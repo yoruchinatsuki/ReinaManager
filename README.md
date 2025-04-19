@@ -37,7 +37,7 @@ The `Reina` in the name is the character <a href="https://vndb.org/c64303"><b>å¦
 
 - [x] Add exe to Launch games
 - [x] Open the local game folder
-- [ ] Home page functions
+- [x] Home page functions
 - [x] Add VNDB api to search games
 - [x] I18n support
 - [ ] Custom data of games

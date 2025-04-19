@@ -106,6 +106,42 @@
             "cancel": "Cancel",
             "apply": "Apply"
         }
-        
+    },
+    "home": {
+        "title": "Home",
+        "stats": {
+            "totalGames": "Total Games",
+            "localGames": "Local Games",
+            "completedGames": "Completed Games",
+            "totalPlayTime": "Total Play Time",
+            "weekPlayTime": "Weekly Play Time",
+            "todayPlayTime": "Today's Play Time"
+        },
+        "repository": "Game Repository",
+        "activityTitle": "Activity",
+        "activity": {
+            "added": "Added {{title}}",
+            "played": "Played {{title}}",
+            "addedAt": "Added at {{time}}",
+            "playedAtTime": "Played at {{time}}",  
+            "duration": "Play duration: {{duration}}"
+        },
+        "lastPlayed": "Last played: {{time}}",
+        "addedAt": "Added at: {{time}}",
+        "recentlyPlayed": "Recently Played",
+        "recentlyAdded": "Recently Added"
+    },
+    "utils":{
+        "relativetime":{
+            "justNow": "Just now",
+            "minutesAgo": "{{count}} minutes ago",
+            "hoursAgo": "{{count}} hours ago",
+            "daysAgo": "{{count}} days ago",
+            "lastWeek": "Last week"
+        },
+        "formatPlayTime":{
+            "minutes": "{{count}} minutes",
+            "hours": "{{count}} hours"
+        }
     }
 }
