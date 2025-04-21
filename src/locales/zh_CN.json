@@ -63,6 +63,7 @@
             "addTime": "添加时间(默认)",
             "releaseTime": "游戏发布时间",
             "Ranking": "综合评分排名",
+            "lastPlayed": "最近游玩",
             "ascending": "升序",
             "descending": "降序",
             "cancel": "取消",
@@ -141,7 +142,8 @@
         },
         "formatPlayTime":{
             "minutes": "{{count}}分钟",
-            "hours": "{{count}}小时"
+            "hours": "{{count}}小时",
+            "hoursAndMinutes": "{{hours}}小时{{minutes}}分钟"
         }
     }
 }

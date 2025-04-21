@@ -141,7 +141,8 @@
         },
         "formatPlayTime":{
             "minutes": "{{count}}分鐘",
-            "hours": "{{count}}小時"
+            "hours": "{{count}}小時",
+            "hoursAndMinutes": "{{hours}}小時{{minutes}}分鐘"
         }
     }
 }

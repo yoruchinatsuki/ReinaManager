@@ -141,7 +141,8 @@
         },
         "formatPlayTime":{
             "minutes": "{{count}} minutes",
-            "hours": "{{count}} hours"
+            "hours": "{{count}} hours",
+            "hoursAndMinutes": "{{hours}}h {{minutes}}min"
         }
     }
 }

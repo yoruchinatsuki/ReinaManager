@@ -291,7 +291,7 @@ export const Home: React.FC = () => {
                                                         : t('home.activity.playedAtTime', { time: formatRelativeTime(activity.time) })}
                                                 </Typography>
 
-                                                {activity.type === 'play' && activity.duration && (
+                                                {activity.type === 'play' && activity.duration !== undefined && (
                                                     <Typography variant="body2" color="text.secondary">
                                                         {t('home.activity.duration', { duration: formatPlayTime(activity.duration) })}
                                                     </Typography>

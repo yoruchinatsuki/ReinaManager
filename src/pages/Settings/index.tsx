@@ -6,6 +6,7 @@ import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Select, { type SelectChangeEvent } from '@mui/material/Select';
 import { useTranslation } from 'react-i18next';
+import { PageContainer } from '@toolpad/core';
 
 export const Settings: React.FC = () => {
     const { t } = useTranslation();
@@ -20,24 +21,29 @@ export const Settings: React.FC = () => {
         openurl("https://next.bgm.tv/demo/access-token/create");
     }
     return (
-        <div className="p-4 space-y-4">
-            <div className="space-y-2">
-                <span>{t('pages.Settings.bgmToken')}</span>
-                <input
-                    type="password"
-                    placeholder={t('pages.Settings.tokenPlaceholder')}
-                    value={inputToken}
-                    onChange={(e) => setInputToken(e.target.value)}
-                />
-                <button type="button" onClick={() => setBgmToken(inputToken)}>
-                    {t('pages.Settings.saveBtn')}
-                </button>
-                <span className="text-blue-400 hover:cursor-pointer" onClick={handleOpen}>
-                    {t('pages.Settings.getToken')}
-                </span>
+        <PageContainer sx={{ maxWidth: '100% !important' }}>
+            <div className="p-4 space-y-4">
+                <div className="space-y-2">
+                    <span>{t('pages.Settings.bgmToken')}</span>
+                    <input
+                        type="password"
+                        placeholder={t('pages.Settings.tokenPlaceholder')}
+                        value={inputToken}
+                        onChange={(e) => setInputToken(e.target.value)}
+                    />
+                    <button type="button" onClick={() => setBgmToken(inputToken)}>
+                        {t('pages.Settings.saveBtn')}
+                    </button>
+                    <span className="text-blue-400 hover:cursor-pointer" onClick={handleOpen}>
+                        {t('pages.Settings.getToken')}
+                    </span>
+                </div>
+                <LanguageSelect />
+                <div>
+                </div>
             </div>
-            <LanguageSelect />
-        </div>
+        </PageContainer>
+
     );
 };
 

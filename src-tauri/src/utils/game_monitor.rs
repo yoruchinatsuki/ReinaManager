@@ -14,7 +14,6 @@ use windows::Win32::{
     System::Threading::{
         GetExitCodeProcess, OpenProcess, PROCESS_QUERY_INFORMATION, PROCESS_VM_READ,
     },
-    UI::WindowsAndMessaging::{GetForegroundWindow, GetWindowThreadProcessId},
 };
 
 // 获取当前时间戳（秒）
@@ -215,18 +214,21 @@ fn is_process_running(pid: u32) -> bool {
 fn is_window_foreground(pid: u32) -> bool {
     #[cfg(target_os = "windows")]
     {
-        unsafe {
-            let foreground_hwnd = GetForegroundWindow();
-            // 修复: 使用窗口句柄的正确检查方法
-            if foreground_hwnd.is_invalid() {
-                return false;
-            }
-
-            let mut window_pid: u32 = 0;
-            GetWindowThreadProcessId(foreground_hwnd, Some(&mut window_pid));
-
-            pid == window_pid
+        // 1. 宽松匹配：只要进程在运行，我们就认为它是活跃的
+        // 这适用于某些全屏游戏或特殊应用
+        if is_process_running(pid) {
+            return true; // 可以根据实际需求调整这个策略
         }
+
+        // 2. 检查子进程
+        let child_pids = get_child_processes(pid);
+        for &child_pid in &child_pids {
+            if is_process_running(child_pid) {
+                return true; // 可以根据实际需求调整这个策略
+            }
+        }
+
+        false
     }
 
     #[cfg(not(target_os = "windows"))]

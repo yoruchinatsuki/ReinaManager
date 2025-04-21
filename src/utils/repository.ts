@@ -14,12 +14,20 @@ function getSortConfig(sortOption = 'addtime', sortOrder: 'asc' | 'desc' = 'asc'
     case 'datetime':
       sortField = 'date';
       break;
+    case 'lastplayed':
+      // 使用子查询实现最近游玩排序
+        //最近游玩的在前，未游玩的在最后
+        customSortSql = `ORDER BY 
+          CASE 
+            WHEN (SELECT last_played FROM game_statistics WHERE game_statistics.game_id = games.id) IS NULL THEN 0 
+            ELSE 1 
+          END DESC,
+          (SELECT last_played FROM game_statistics WHERE game_statistics.game_id = games.id) DESC,
+          games.id DESC`;
+      break;
     case 'rank':
-      // 修正的综合排序逻辑：
-      // 1. 首先按评分排序 - 遵循用户选择的排序方向
-      // 2. 对于评分相同的游戏，再按排名排序 - 注意排名低的数值小
+      // 修正的综合排序逻辑...
       if (sortOrder.toUpperCase() === 'DESC') {
-        // 降序排列：高分在前，同分时排名好的在前
         customSortSql = `ORDER BY 
           score DESC, 
           CASE 
@@ -27,7 +35,6 @@ function getSortConfig(sortOption = 'addtime', sortOrder: 'asc' | 'desc' = 'asc'
             ELSE rank 
           END ASC`;
       } else {
-        // 升序排列：低分在前，同分时排名差的在前
         customSortSql = `ORDER BY 
           score ASC, 
           CASE 
@@ -99,26 +106,6 @@ export async function getGames(sortOption = 'addtime', sortOrder: 'asc' | 'desc'
   return processGameRows(rows);
 }
 
-// // 通过外部ID(bgm_id或vndb_id)查找内部ID
-// export async function getInternalIdByExternalId(externalId: string): Promise<number | null> {
-//   const db = await getDb();
-//   let query: string;
-//   let params: string[];
-  
-//   if (externalId.startsWith('v')) {
-//     // vndb格式ID
-//     query = "SELECT id FROM games WHERE vndb_id = ? LIMIT 1";
-//     params = [externalId];
-//   } else {
-//     // 假设是bgm格式ID
-//     query = "SELECT id FROM games WHERE bgm_id = ? LIMIT 1";
-//     params = [externalId];
-//   }
-  
-//   const result = await db.select<{id: number}[]>(query, params);
-//   return result.length > 0 ? result[0].id : null;
-// }
-
 // 通过内部ID获取游戏数据
 export async function getGameById(id: number): Promise<GameData | null> {
   const db = await getDb();
@@ -129,13 +116,6 @@ export async function getGameById(id: number): Promise<GameData | null> {
   if (rows.length === 0) return null;
   return processGameRows(rows)[0];
 }
-
-// // 按 game_id 文本标识查找游戏数据 - 修改为使用内部ID
-// export async function getGameByGameId(gameId: string): Promise<GameData | null> {
-//   const internalId = await getInternalIdByExternalId(gameId);
-//   if (internalId === null) return null;
-//   return getGameById(internalId);
-// }
 
 // 删除游戏记录 
 export async function deleteGame(gameId: number) {

@@ -24,12 +24,10 @@ interface GameTimeChartData {
 interface InfoBoxProps {
     game: GameData;
 }
-
 // 封装的统计信息组件 - 简化为演示结构，等待重构
 const InfoBox: React.FC<InfoBoxProps> = ({ game }) => {
     const { t } = useTranslation();
     const [loading, setLoading] = useState(false);
-    const [isInitialLoad, setIsInitialLoad] = useState(true);
     const { loadGameStats, runningGameIds } = useGamePlayStore();
     const [stats, setStats] = useState<GameTimeStats | null>(null);
     const gameId = game.id as number;
@@ -39,25 +37,19 @@ const InfoBox: React.FC<InfoBoxProps> = ({ game }) => {
 
     // 定义并保存 fetchStats 函数
     const fetchStats = useCallback(async (silent = false) => {
-        // 仅当不是静默更新或初始加载时，设置加载状态为true
         if (!silent) {
             setLoading(true);
         }
         try {
             const gameStats = await loadGameStats(gameId, true); // 强制刷新
             setStats(gameStats);
-            if (isInitialLoad) {
-                setIsInitialLoad(false);
-            }
         } catch (error) {
             console.error('加载游戏统计失败:', error);
         } finally {
+            // 修复重复设置loading状态的问题
             setLoading(false);
-            if (!silent) {
-                setLoading(false);
-            }
         }
-    }, [gameId, loadGameStats, isInitialLoad]);
+    }, [gameId, loadGameStats]);
 
     // 初始加载数据
     useEffect(() => {
@@ -72,42 +64,45 @@ const InfoBox: React.FC<InfoBoxProps> = ({ game }) => {
         // 如果游戏从运行状态变为非运行状态，刷新统计
         if (prevRunningRef.current && !isCurrentGameRunning) {
             // 游戏刚刚关闭，延迟一点执行以确保后端数据已更新
-            setTimeout(() => {
+            const timer = setTimeout(() => {
                 fetchStats(true);// 静默更新
             }, 500);
+            return () => clearTimeout(timer); // 清理定时器
         }
 
         // 更新状态引用
         prevRunningRef.current = isCurrentGameRunning;
     }, [runningGameIds, gameId, fetchStats]);
-
     // 统计项数据
-    const statItems = [
-        {
-            color: 'primary',
-            icon: <SportsEsportsIcon fontSize="small" />,
-            title: t('pages.Detail.playCount'),
-            value: stats ? `${stats.sessionCount}` : '0'
-        },
-        {
-            color: 'primary',
-            icon: <TodayIcon fontSize="small" />,
-            title: t('pages.Detail.todayPlayTime'),
-            value: stats ? `${stats.todayPlayTime}` : '0分钟'
-        },
-        {
-            color: 'primary',
-            icon: <AccessTimeIcon fontSize="small" />,
-            title: t('pages.Detail.totalPlayTime'),
-            value: stats ? `${stats.totalPlayTime}` : '0分钟'
-        },
-        {
-            color: 'primary',
-            icon: <BackupIcon fontSize="small" />,
-            title: t('pages.Detail.backupCount'),
-            value: '0' // 备份功能暂未实现，保留原值
-        }
-    ];
+    const statItems = useMemo(() =>
+        [
+            {
+                color: 'primary',
+                icon: <SportsEsportsIcon fontSize="small" />,
+                title: t('pages.Detail.playCount'),
+                value: stats ? `${stats.sessionCount}` : '0'
+            },
+            {
+                color: 'primary',
+                icon: <TodayIcon fontSize="small" />,
+                title: t('pages.Detail.todayPlayTime'),
+                value: stats ? `${stats.todayPlayTime}` : '0分钟'
+            },
+            {
+                color: 'primary',
+                icon: <AccessTimeIcon fontSize="small" />,
+                title: t('pages.Detail.totalPlayTime'),
+                value: stats ? `${stats.totalPlayTime}` : '0分钟'
+            },
+            {
+                color: 'primary',
+                icon: <BackupIcon fontSize="small" />,
+                title: t('pages.Detail.backupCount'),
+                value: '0' // 备份功能暂未实现，保留原值
+            }
+        ],
+        [stats, t]
+    )
 
     // 生成过去7天的补全数据
     const chartData = useMemo(() => {
@@ -226,6 +221,7 @@ export const Detail: React.FC = () => {
     const [game, setGame] = useState<GameData>();
     const [loading, setLoading] = useState<boolean>(true);
     const id = Number(useLocation().pathname.split('/').pop());
+
 
     // 加载游戏数据
     useEffect(() => {
